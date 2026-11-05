@@ -1,0 +1,163 @@
+{
+  "dashboard": {
+    "date": "Çar, 4 Kasım 2026 · 11:35",
+    "greeting": "Merhaba Çağrı 👋",
+    "intro": "Mağazanın genel durumu. AI her bölümde hazırlık yaptı; onay bekleyen işler aşağıda — hepsinde son söz sende.",
+    "alert": { "title": "Bugün dikkat isteyen 11 iş var", "sub": "8 moderasyon + 3 yüksek güvenli AI önerisi onayını bekliyor.", "action": "Kuyruğa git" },
+    "stats": [
+      { "label": "Bekleyen moderasyon", "value": "8", "sub": "3 AI bayraklı", "subTone": "orange" },
+      { "label": "Katalog doluluk", "value": "%84", "sub": "214 kitap eksik", "subTone": "orange" },
+      { "label": "Karşılıksız oran", "value": "%7,8", "sub": "~340 kaçan sipariş", "subTone": "red" },
+      { "label": "Onay bekleyen seçki", "value": "5", "sub": "küratör kuyruğu", "subTone": "blue" }
+    ],
+    "sections": [
+      { "name": "Karşılıksız Sorgular", "desc": "Katalogda karşılığı çıkmayan talepler ve kümeleri.", "chip": "%7,8", "to": "/yonetim/sorgular" },
+      { "name": "Küratör Paneli", "desc": "AI'nın hazırladığı seçki ve vitrin önerileri.", "chip": "5 öneri", "to": "/yonetim/kurator" },
+      { "name": "Veri Kalitesi", "desc": "Eksik künye/metadata ve doldurma önerileri.", "chip": "214", "to": "/yonetim/veri-kalitesi" },
+      { "name": "Moderasyon", "desc": "Yorum ve alıntı onay/red kuyruğu.", "chip": "8", "to": "/yonetim/moderasyon" }
+    ],
+    "recent": [
+      { "tone": "green", "text": "Küratör önerisi onaylandı: “Haftanın keşifleri” yayına alındı.", "when": "18 dk önce" },
+      { "tone": "blue", "text": "“Dönüşüm” için ekol ve kağıt cinsi AI önerisiyle dolduruldu.", "when": "1 saat önce" },
+      { "tone": "orange", "text": "2 yorum spam gerekçesiyle reddedildi.", "when": "2 saat önce" },
+      { "tone": "purple", "text": "Yeni talep kümesi: “çağdaş Japon edebiyatı” (218 sorgu).", "when": "5 saat önce" }
+    ],
+    "note": "Örnek pano; rakamlar dört bölümün gerçek verisinden toplanır."
+  },
+  "queries": {
+    "intro": "Alıcıların sorduğu ama katalogda karşılığı çıkmayan istekler. Her biri bir talep sinyali — hangi kitapları getirmen, hangi metadatayı eklemen gerektiğini gösterir.",
+    "ranges": ["7 gün", "30 gün", "90 gün"],
+    "stats": [
+      { "label": "Toplam sorgu (30g)", "value": "18.420", "sub": "▲ %12 geçen aya göre", "subTone": "green" },
+      { "label": "Karşılıksız oran", "value": "%7,8", "sub": "1.437 sorgu boş döndü", "subTone": "orange" },
+      { "label": "En sık boş sorgu", "value": "“çağdaş Japon”", "sub": "112 kez soruldu" },
+      { "label": "Tahmini kaçan talep", "value": "~340 sipariş", "sub": "eşleşseydi" }
+    ],
+    "rows": [
+      { "query": "“çağdaş Japon edebiyatı”", "kind": "Tür / konu", "tone": "blue", "count": 112, "trend": "▲ %38", "action": "Kataloğa öner" },
+      { "query": "“Murakami tarzı ama daha kısa”", "kind": "Dilek / nitelik", "tone": "orange", "count": 87, "trend": "▲ %21", "action": "Eşle" },
+      { "query": "“sesli kitabı olanlar”", "kind": "Dilek / nitelik", "tone": "orange", "count": 74, "trend": "▲ %64", "action": "Metadata" },
+      { "query": "“Yüz Kültür yayınları”", "kind": "Yayınevi / seri", "tone": "purple", "count": 51, "trend": "— sabit", "action": "Kataloğa öner" },
+      { "query": "“İskandinav polisiyesi serisi”", "kind": "Yayınevi / seri", "tone": "purple", "count": 43, "trend": "▲ %17", "action": "Kataloğa öner" },
+      { "query": "“disleksi dostu baskı”", "kind": "Dilek / nitelik", "tone": "orange", "count": 29, "trend": "▲ %9", "action": "Metadata" }
+    ],
+    "clusters": [
+      { "name": "Çağdaş Japon edebiyatı", "count": "218 sorgu", "desc": "Murakami dışı çağdaş Japon yazarlar isteniyor; katalogda 4 başlık var, talep yüksek." },
+      { "name": "Sesli kitap / erişilebilir baskı", "count": "131 sorgu", "desc": "Sesli sürüm ve disleksi-dostu baskı soruları artıyor; şu an metadatada bu alan yok." },
+      { "name": "Niş yayınevi serileri", "count": "96 sorgu", "desc": "Küçük yayınevlerinin seri takibi isteniyor; bazıları katalogda eksik." }
+    ],
+    "note": "Örnek veri; gerçek rakamlar sorgu loglarından (query_storefront) ve katalog eşleşme oranından hesaplanır."
+  },
+  "curator": {
+    "intro": "İlke: AI önerir, insan onaylar. Kâşif vitrin bloklarını ve haftalık seçkileri gerekçesiyle hazırlar; yayına almadan önce sen onaylarsın.",
+    "pendingTitle": "Onay bekleyen AI önerileri",
+    "pending": [
+      {
+        "kind": "HAFTALIK SEÇKİ", "tone": "blue", "confidence": "güven %88",
+        "title": "Uzun kış geceleri için yavaş okumalar", "sub": "Ana sayfa · bu hafta · 4 kitap",
+        "books": ["Stoner — John Williams", "Yalnızlığın Keşfi", "Kayıp Zamanın İzinde I", "Bir Kış Gecesi Eğer…"],
+        "reason": "Son 30 günde \"sakin\", \"yavaş\", \"melankolik\" eksenli sorgular %34 arttı. Bu dört başlık yüksek okur-görüşü (≥%90 olumlu) taşıyor ve stokta.",
+        "source": "Kaynak: sorgu kümeleri + okur-görüşü + stok"
+      },
+      {
+        "kind": "VİTRİN BLOĞU", "tone": "orange", "confidence": "güven %81",
+        "title": "Çok sorulan, az görünen: Çağdaş Japon", "sub": "Keşif önerisi · kalıcı blok",
+        "books": ["Toshikazu Kawaguchi", "Sayaka Murata", "Mieko Kawakami"],
+        "reason": "Karşılıksız sorgu analitiğinde 218 istek \"çağdaş Japon\" kümesinde. Katalogdaki 4 başlık görünürlüğü düşük; öne çıkarmak kaçan talebi yakalar.",
+        "source": "Kaynak: karşılıksız sorgu analitiği"
+      },
+      {
+        "kind": "YAZAR ODAĞI", "tone": "green", "confidence": "güven %76",
+        "title": "Sabahattin Ali — 100. yıl derlemesi", "sub": "Yazar sayfası · süreli",
+        "books": ["Kürk Mantolu Madonna", "İçimizdeki Şeytan", "Kuyucaklı Yusuf"],
+        "reason": "Yazar takip sayısı ayda %22 arttı; üç başlık da ilk 100 çok satan içinde. Derleme bloğu sadakat ve sepet büyüklüğünü artırabilir.",
+        "source": "Kaynak: takip verisi + satış sıralaması"
+      }
+    ],
+    "live": {
+      "title": "Yayındaki seçkiler", "sub": "Şu an mağazada görünenler.",
+      "items": [
+        { "name": "Haftanın keşifleri", "sub": "Ana sayfa · 6 kitap · 2 gün önce", "tone": "green" },
+        { "name": "Ödüllü çağdaş romanlar", "sub": "Vitrin · 8 kitap · 1 hafta önce", "tone": "green" },
+        { "name": "Sonbahar indirimleri", "sub": "Kampanya · planlandı", "tone": "amber" }
+      ]
+    },
+    "note": "Örnek öneriler; gerçek seçkiler katalog + satış + okur-görüşü verisinden üretilir. Hiçbir öneri onay olmadan yayına çıkmaz."
+  },
+  "quality": {
+    "intro": "Katalogda eksik künye alanları keşfi ve önerileri zayıflatır. Kâşif eksikleri bulur, doldurma önerir; sen onaylarsın. Onaysız hiçbir alan yazılmaz.",
+    "stats": [
+      { "label": "Katalog doluluk", "value": "%84", "sub": "▲ %3 bu ay", "subTone": "green" },
+      { "label": "Eksik alanlı kitap", "value": "214", "sub": "kuyrukta bekliyor", "subTone": "orange" },
+      { "label": "En eksik alan", "value": "Ekol / metrik", "sub": "%41 boş" },
+      { "label": "Bu hafta tamamlanan", "value": "96 kitap", "sub": "AI + onay", "subTone": "green" }
+    ],
+    "queueTitle": "Doldurma bekleyen kitaplar",
+    "queue": [
+      {
+        "title": "Dönüşüm", "byline": "Franz Kafka · Can Yayınları", "fill": 55,
+        "missing": ["Kağıt cinsi", "Boyut", "Ekol"],
+        "suggestions": [["Kağıt cinsi", "Kitap kağıdı", "%92"], ["Ekol", "Varoluşçuluk, Modernizm", "%80"]],
+        "source": "Kaynak: yayıncı verisi + benzer baskılar"
+      },
+      {
+        "title": "Beyaz Geceler", "byline": "Dostoyevski · İş Bankası Kültür", "fill": 70,
+        "missing": ["Boyut", "Kazanılacak puan"],
+        "suggestions": [["Boyut", "12 × 19,5 cm", "%88"], ["Kazanılacak puan", "78 puan", "%99"]],
+        "source": "Kaynak: künye + puan formülü (≈1,85/TL)"
+      },
+      {
+        "title": "Kör Baykuş", "byline": "Sadık Hidayet · Yapı Kredi Yayınları", "fill": 48,
+        "missing": ["Ekol", "Yazar biyografisi", "Kağıt cinsi"],
+        "suggestions": [["Ekol", "Sürrealizm, Gotik", "%74"], ["Yazar biyografisi", "Taslak hazır (312 kelime)", "%69"]],
+        "source": "Kaynak: yazar bio havuzu + benzer eserler"
+      }
+    ],
+    "fieldFill": {
+      "title": "Alan bazında doluluk", "sub": "23.600 kitap üzerinden.",
+      "fields": [
+        { "name": "Kağıt cinsi", "pct": 72, "tone": "blue" },
+        { "name": "Boyut / ebat", "pct": 68, "tone": "blue" },
+        { "name": "Ekol / metrik (AI)", "pct": 59, "tone": "orange" },
+        { "name": "Yazar biyografisi", "pct": 81, "tone": "teal" },
+        { "name": "Kazanılacak puan", "pct": 94, "tone": "teal" }
+      ]
+    },
+    "note": "Örnek veri; gerçek doluluk Kitapyurdu_Katalog_v2 alanlarından okunur. AI önerileri yayıncı verisi/künye/benzer kitaplardan türetilir."
+  },
+  "moderation": {
+    "intro": "Okur yorumları ve alıntılar yayına çıkmadan önce buraya düşer. Kâşif otomatik risk işaretler (spam, spoiler, hakaret, telif); son kararı sen verirsin.",
+    "stats": [
+      { "label": "Bekleyen", "value": "8", "sub": "moderasyon kuyruğu", "subTone": "orange" },
+      { "label": "Otomatik bayraklı", "value": "3", "sub": "AI risk işaretledi", "subTone": "orange" },
+      { "label": "Bugün onaylanan", "value": "41", "sub": "▲ normal tempo", "subTone": "green" },
+      { "label": "Ort. onay süresi", "value": "2,4 sa", "sub": "▼ geçen haftadan", "subTone": "green" }
+    ],
+    "tabs": ["Bekleyen (8)", "Bayraklı (3)", "Onaylanan", "Reddedilen"],
+    "queue": [
+      { "kind": "YORUM", "user": "mavi_okur", "book": "1984", "when": "12 dk önce", "flag": null, "flagOk": "AI: risk yok", "text": "Çevirisi akıcı, distopya sevenler için başucu kitabı. Son bölüm beni günlerce düşündürdü.", "stars": 5 },
+      { "kind": "ALINTI", "user": "kitapkurdu34", "book": "Dönüşüm", "when": "40 dk önce", "flag": "AI: olası spoiler · %72", "text": "“Gregor bir sabah uyandığında kendini…” (alıntı kitabın sonunu ele veriyor olabilir)", "stars": null },
+      { "kind": "YORUM", "user": "anon_8842", "book": "Simyacı", "when": "1 saat önce", "flag": "AI: spam şüphesi · %86", "text": "harika!! hemen al >> indirim linki profilimde takip et ve kazan", "stars": 5 },
+      { "kind": "YORUM", "user": "derin_sayfa", "book": "Sineklerin Tanrısı", "when": "2 saat önce", "flag": null, "flagOk": "AI: risk yok", "text": "Lise yıllarımda okumuştum, tekrar okuyunca farklı katmanlar gördüm. Baskı ve kağıt kalitesi iyi.", "stars": 4 }
+    ],
+    "note": "Örnek kuyruk; gerçek içerik okur yorum/alıntı akışından gelir. AI yalnızca işaretler, yayın kararını insan verir."
+  },
+  "orders": {
+    "intro": "Fiziksel kitap siparişlerinin durumu ve iade talepleri. Kâşif iade sebebini özetler ve bir öneri sunar; kararı sen verirsin.",
+    "stats": [
+      { "label": "Bugünkü sipariş", "value": "37", "sub": "▲ %9 düne göre", "subTone": "green" },
+      { "label": "Kargoda", "value": "112", "sub": "yolda olan paket" },
+      { "label": "İade talebi", "value": "3", "sub": "karar bekliyor", "subTone": "orange" },
+      { "label": "İade oranı (30g)", "value": "%2,1", "sub": "▼ sektör altı", "subTone": "green" }
+    ],
+    "tabs": ["Siparişler", "İade talepleri (3)"],
+    "rows": [
+      { "no": "#KSF-10482", "customer": "Selin Yılmaz", "books": "1984, Sineklerin Tanrısı (+1)", "amount": "352,38 TL", "status": "Kargoda", "tone": "blue" },
+      { "no": "#KSF-10481", "customer": "Mert Aydın", "books": "Kürk Mantolu Madonna", "amount": "43,00 TL", "status": "Teslim edildi", "tone": "green" },
+      { "no": "#KSF-10480", "customer": "Deniz Kaya", "books": "Dönüşüm, Kör Baykuş", "amount": "128,50 TL", "status": "Hazırlanıyor", "tone": "orange" },
+      { "no": "#KSF-10479", "customer": "Ece Demir", "books": "Simyacı", "amount": "275,00 TL", "status": "Kargoda", "tone": "blue" },
+      { "no": "#KSF-10478", "customer": "Barış Şen", "books": "Beyaz Geceler (+2)", "amount": "214,90 TL", "status": "Teslim edildi", "tone": "green" }
+    ],
+    "note": "Örnek veri; gerçek siparişler ve iade talepleri sipariş servisinden (Marten/Postgres) gelir. İade sebebi müşteri metninden AI ile özetlenir, karar insana aittir."
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "statusBanner": "Yeni çıkış motoru aktif • 4 kaynak izleniyor",
+  "intro": "Takip ettiğin yazar, yayınevi ve serilerde yeni kitap ya da yeni baskı çıktığında Kâşif seni haberdar eder. Takip etmek için kitap detayındaki “Takip et” düğmesini kullan.",
+  "news": {
+    "title": "Takiplerinden yeni haberler",
+    "window": "Son 30 gün",
+    "items": [
+      { "kind": "YENİ", "tone": "orange", "text": "“Ateşi Yakalamak” — takip ettiğin Açlık Oyunları serisinde yeni baskı", "sub": "Seri · Pegasus Yayınları · 2 gün önce" },
+      { "kind": "ÇIKIŞ", "tone": "green", "text": "İthaki Yayınları'ndan 3 yeni bilimkurgu çevirisi rafta", "sub": "Yayınevi · İthaki · 5 gün önce" },
+      { "kind": "BASKI", "tone": "amber", "text": "George Orwell — “1984” için yeni baskı (52. basım) stoğa girdi", "sub": "Yazar · Can Yayınları · 1 hafta önce" }
+    ]
+  },
+  "filters": ["Tümü", "Yazarlar", "Yayınevleri", "Seriler"],
+  "cards": [
+    { "initials": "GO", "name": "George Orwell", "kind": "Yazar", "sub": "4 kitabı katalogda · 1.2B takipçi", "activity": "Yeni baskı: “1984” 52. basım", "active": true, "notify": true },
+    { "initials": "it", "name": "İthaki Yayınları", "kind": "Yayınevi", "sub": "860 kitap · haftada ~3 yeni çıkış", "activity": "3 yeni bilimkurgu çevirisi eklendi", "active": true, "notify": true },
+    { "initials": "AO", "name": "Açlık Oyunları", "kind": "Seri", "sub": "3 ciltlik seri · 1 cildini okudun", "activity": "Yeni baskı: “Ateşi Yakalamak”", "active": true, "notify": true },
+    { "initials": "SA", "name": "Sabahattin Ali", "kind": "Yazar", "sub": "7 kitabı katalogda · 980B takipçi", "activity": "Son 30 günde yeni hareket yok", "active": false, "notify": false }
+  ],
+  "note": "Örnek takip verisi; gerçek yeni çıkış ve baskı bilgisi yayınevi/ürün kataloğundan gelir. Kâşif yalnızca kataloğa düşen gerçek kayıtları bildirir."
+}

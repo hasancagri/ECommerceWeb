@@ -1,0 +1,19 @@
+{
+  "tasteProfile": ["Felsefe", "Distopya", "Bilim Kurgu"],
+  "statusBanner": "AI Danışmanın Hazır • Filtresiz & Doğal Dil Odaklı Arama",
+  "messages": [
+    {
+      "role": "user",
+      "time": "14:24",
+      "text": "“Yoğun ve stresli günlerin ardından beni alıp başka dünyalara götürecek, hafif felsefi derinliği olan sürükleyici bir kurgu arıyorum.”"
+    },
+    {
+      "role": "assistant",
+      "badge": "Anlamsal eşleşme başarılı",
+      "text": "Zihnini dinlendirecek, felsefi derinliği olan sürükleyici kurgulara yöneldiğini anladım. Üç öneri: {Simyacı — Paulo Coelho}, bir çırpıda okunan, hafif ama derin bir yolculuk; {Sineklerin Tanrısı — William Golding}, insan doğasına dair sarsıcı bir alegori; ve {Kürk Mantolu Madonna — Sabahattin Ali}, melankolik ve unutulmaz bir klasik. Herhangi birinin fiyatı, puanı ve ayrıntılı gerekçesi için adına dokunman yeterli. Daha karanlık, daha umutlu ya da daha kısa bir ton istersen aşağıdan sohbeti sürdür."
+    }
+  ],
+  "expanders": ["En popüler kitapları getir", "İndirimdeki kitapları getir", "Haftanın yayınevlerini getir"],
+  "inputPlaceholder": "Sohbeti sürdür… örn. “Biraz daha melankolik ve karanlık olsun”",
+  "disclaimer": "Yanıtlar yapay zekâ ile üretilir; fiyat ve stok bilgisini detay sayfasından doğrulayabilirsin."
+}

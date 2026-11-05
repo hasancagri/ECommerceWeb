@@ -1,0 +1,18 @@
+{
+  "number": "#KSF-2026-04827",
+  "placedAt": "3 Kasım 2026, 21:36",
+  "emailMasked": "selin@…",
+  "timeline": [
+    { "title": "Ödeme alındı", "sub": "3 Kasım 2026, 21:36 · Visa •••• 6411", "state": "done" },
+    { "title": "Hazırlanıyor", "sub": "Siparişin depoda hazırlanıyor", "state": "current" },
+    { "title": "Kargoya verildi", "sub": "Kargoya verilince takip numarası paylaşılır", "state": "pending" },
+    { "title": "Teslim edildi", "sub": "Tahmini teslim: 5 Kasım 2026", "state": "pending" }
+  ],
+  "delivery": { "address": "Ev · Selin Yılmaz", "addressSub": "Üsküdar, İstanbul", "cargo": "Henüz atanmadı", "cargoSub": "Hazırlık tamamlanınca atanır" },
+  "lines": [
+    { "title": "1984", "sub": "George Orwell · 1 adet", "price": "141,38 TL" },
+    { "title": "Sineklerin Tanrısı", "sub": "William Golding · 1 adet", "price": "168,00 TL" },
+    { "title": "Kürk Mantolu Madonna", "sub": "Sabahattin Ali · 1 adet", "price": "43,00 TL" }
+  ],
+  "summary": { "subtotal": "465,00 TL", "discount": "-112,62 TL", "shipping": "Ücretsiz", "total": "352,38 TL", "points": "652 puan hesabına eklendi" }
+}

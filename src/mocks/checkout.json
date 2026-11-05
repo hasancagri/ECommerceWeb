@@ -1,0 +1,20 @@
+{
+  "addresses": [
+    { "name": "Ev", "isDefault": true, "line": "Selin Yılmaz · Üsküdar, İstanbul · 0532 •• •• 14" },
+    { "name": "İş", "isDefault": false, "line": "Selin Yılmaz · Levent, İstanbul · 0532 •• •• 14" }
+  ],
+  "cards": [
+    { "label": "Kayıtlı kart · Visa •••• 6411", "brand": "VISA", "saved": true },
+    { "label": "Yeni kartla öde", "saved": false }
+  ],
+  "installments": ["Tek çekim", "3 Taksit", "6 Taksit"],
+  "lines": [
+    { "title": "1984", "qty": "x1", "price": "141,38 TL" },
+    { "title": "Sineklerin Tanrısı", "qty": "x1", "price": "168,00 TL" },
+    { "title": "Kürk Mantolu Madonna", "qty": "x1", "price": "43,00 TL" }
+  ],
+  "summary": { "subtotal": "465,00 TL", "discount": "-112,62 TL", "shipping": "Ücretsiz", "total": "352,38 TL" },
+  "pointsPay": "Cüzdanında 1240 puan (≈ 62,00 TL)",
+  "pointsEarn": "652 puan kazanacaksın",
+  "securityNote": "Ödemen 3D Secure ile korunur. Kart bilgilerin Kâşif'te saklanmaz."
+}

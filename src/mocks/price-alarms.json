@@ -1,0 +1,30 @@
+{
+  "statusBanner": "Fiyat motoru aktif • 2 hedef dinleniyor",
+  "intro": "Takip ettiğin kitaplarda fiyat düşüşlerini algoritmik olarak izler; eşiğe ulaşıldığında anlık bildirim ve kısa bir LLM özeti üretir.",
+  "stats": [
+    { "label": "Aktif takip", "value": "6 eser", "sub": "2 bekleyen eşik" },
+    { "label": "Ort. indirim olasılığı", "value": "%68", "sub": "Önümüzdeki 30 gün", "subTone": "green" },
+    { "label": "Son 30 gün kazancı", "value": "420 ₺", "sub": "▼ %26 tasarruf", "subTone": "green" }
+  ],
+  "tracked": [
+    { "title": "Otomatik Portakal", "author": "Anthony Burgess", "current": "106 ₺", "target": "64 ₺", "progress": 72 },
+    { "title": "Kürk Mantolu Madonna", "author": "Sabahattin Ali", "current": "60 ₺", "target": "43 ₺", "progress": 100 }
+  ],
+  "automation": {
+    "title": "Otomasyon kuralları",
+    "sub": "Eşik tetiklendiğinde ne olsun?",
+    "rules": [
+      { "label": "LLM özet e-postası gönder", "on": true },
+      { "label": "Kritik fiyatta otomatik sepete ekle", "on": false }
+    ],
+    "note": "Uçtan uca şifreli oturum ve MCP korumalı ajanlar"
+  },
+  "recent": {
+    "title": "Tetiklenen son alarmlar",
+    "sub": "Son 14 günün kayıtları",
+    "items": [
+      { "title": "Otomatik Portakal — Anthony Burgess", "text": "Dün 106 ₺ yerine 64 ₺ seviyesine indi. LLM özet e-postası iletildi.", "action": "İncele" },
+      { "title": "Kürk Mantolu Madonna — Sabahattin Ali", "text": "3 gün önce 60 ₺ yerine 43 ₺ tetiklendi. Sepete eklendi.", "action": "Arşivle" }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "items": [
+    { "title": "1984", "byline": "George Orwell · Can Yayınları", "price": "141,38 TL", "oldPrice": "195,00 TL", "discount": "-%27", "unit": "birim 141,38 TL", "qty": 1 },
+    { "title": "Sineklerin Tanrısı", "byline": "William Golding · İş Bankası Kültür", "price": "168,00 TL", "oldPrice": "210,00 TL", "discount": "-%20", "unit": "birim 168,00 TL", "qty": 1 },
+    { "title": "Kürk Mantolu Madonna", "byline": "Sabahattin Ali · Yapı Kredi Yayınları", "price": "43,00 TL", "oldPrice": "60,00 TL", "discount": "-%28", "unit": "birim 43,00 TL", "qty": 1 }
+  ],
+  "stockNote": "Stokta · 24 saatte kargoda",
+  "summary": {
+    "subtotal": "465,00 TL",
+    "discount": "-112,62 TL",
+    "shipping": "Ücretsiz",
+    "total": "352,38 TL",
+    "points": "Bu siparişten 652 puan kazanacaksın"
+  },
+  "shippingNote": "Siparişin onaylandıktan sonra 24 saat içinde kargoya verilir. 150 TL ve üzeri siparişte kargo ücretsiz."
+}

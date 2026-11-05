@@ -1,0 +1,8 @@
+{
+  "intro": "Siparişlerinde kullanılan teslimat adreslerin.",
+  "items": [
+    { "name": "Ev", "isDefault": true, "person": "Selin Yılmaz", "line": "Üsküdar, İstanbul", "phone": "0532 ••• •• 14" },
+    { "name": "İş", "isDefault": false, "person": "Selin Yılmaz", "line": "Levent, İstanbul", "phone": "0532 ••• •• 14" },
+    { "name": "Annem", "isDefault": false, "person": "Ayşe Yılmaz", "line": "Kadıköy, İstanbul", "phone": "0533 ••• •• 02" }
+  ]
+}

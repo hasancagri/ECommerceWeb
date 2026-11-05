@@ -1,0 +1,9 @@
+{
+  "total": "4 kayıtlı pasaj",
+  "items": [
+    { "text": "“Özgürlük, iki kere ikinin dört ettiğini söyleyebilmektir.”", "book": "1984", "author": "George Orwell", "date": "14 Eylül" },
+    { "text": "“Bir şeyi gerçekten istediğinde, bütün evren onu gerçekleştirmen için işbirliği yapar.”", "book": "Simyacı", "author": "Paulo Coelho", "date": "2 Ekim" },
+    { "text": "“İnsanlar birbirini tanımak için ne kadar az şey yaparlar.”", "book": "Kürk Mantolu Madonna", "author": "Sabahattin Ali", "date": "28 Ağustos" },
+    { "text": "“Belki de canavar bizden başkası değildir.”", "book": "Sineklerin Tanrısı", "author": "William Golding", "date": "19 Haziran" }
+  ]
+}

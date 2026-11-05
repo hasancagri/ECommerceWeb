@@ -1,0 +1,81 @@
+{
+  "matchBanner": "AI eşleşme oranı: %97 • “Zihinsel kaçış & felsefi kurgu” talebinle tam uyum",
+  "tags": ["Distopya Başyapıtı", "Dünya Klasikleri"],
+  "title": "1984",
+  "byline": "George Orwell · Can Yayınları · Çev. Celâl Üster",
+  "rating": 5.0,
+  "ratingCount": "19.494 değerlendirme",
+  "pages": 352,
+  "anchor": "“Gerçeğin, dilin ve belleğin iktidar tarafından nasıl yeniden yazıldığını gösteren, 20. yüzyılın en keskin uyarısı. Seni günlük gerçeklikten koparıp tedirgin edici bir berraklığa taşır.”",
+  "kunye": [
+    ["Yayınevi", "Can Yayınları"], ["ISBN", "9789750718533"],
+    ["Yayın Tarihi", "25.04.2019"], ["Dil", "Türkçe"],
+    ["Sayfa Sayısı", "352"], ["Cilt Tipi", "Karton Kapak"],
+    ["Kağıt Cinsi", "Kitap Kağıdı"], ["Boyut", "12.5 × 19.5 cm"],
+    ["Liste Fiyatı", "195,00 TL"]
+  ],
+  "purchased": "Bu üründen 201.805 adet satın alındı.",
+  "categories": ["Edebiyat › Roman (Çeviri)", "Orijinal Dil › İngilizce"],
+  "series": {
+    "name": "Açlık Oyunları Üçlemesi",
+    "items": [
+      { "no": 1, "title": "Açlık Oyunları", "state": "Okudun · ★★★★★", "done": true },
+      { "no": 2, "title": "Ateşi Yakalamak", "state": "Şu an incelediğin kitap", "current": true },
+      { "no": 3, "title": "Alaycı Kuş", "state": "Sırada" }
+    ],
+    "note": "Örnek seri verisi: gerçek seri ve okuma sırası üründen gelir."
+  },
+  "metrics": [
+    { "label": "OKUMA TEMPOSU", "value": "Dengeli & Sürükleyici", "sub": "Kesintisiz akış" },
+    { "label": "BİLİŞSEL EFOR", "value": "3 / 5", "sub": "Orta yoğunluk" },
+    { "label": "TAHMİNİ SÜRE", "value": "~5.9 Saat", "sub": "352 sayfa" },
+    { "label": "BİTİRME ORANI", "value": "%94", "sub": "23.305 okur bitirmiş" }
+  ],
+  "concepts": ["Distopya", "Totalitarizm Eleştirisi", "Gözetim Toplumu", "Dil & İktidar", "Bellek & Gerçeklik"],
+  "priceHistory": {
+    "months": ["Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas"],
+    "values": [165, 158, 172, 149, 155, 141.38],
+    "low": "141,38 TL", "high": "172,00 TL", "current": "141,38 TL",
+    "badge": "Son 6 ayın en düşüğü",
+    "source": "Kaynak: son 6 ayın satış fiyatı kayıtları."
+  },
+  "price": "141,38 TL", "oldPrice": "195,00", "discount": "%27 AI indirimi",
+  "points": 262,
+  "stock": "Stokta 10+ adet · 24 saatte kargoda",
+  "argumentCore": {
+    "title": "AI Argüman Çekirdeği üyelere özel",
+    "text": "Bu kitabın sana özel gerekçesini, kaçış indeksini ve düşünsel omurga analizini görmek için giriş yap. Analiz, okuma profiline göre kişiselleştirilir."
+  },
+  "askPanel": {
+    "title": "Bu kitap için Kâşif'e sor",
+    "sub": "Yalnızca 1984 hakkında yanıtlar",
+    "spoiler": "Spoiler koruması açık — Kâşif olay örgüsünü ve finali ele vermeden yanıtlar.",
+    "questions": ["Bu kitap benim için fazla ağır gelir mi?", "Celâl Üster çevirisi ne kadar iyi?", "Önce 1984 mü, Hayvan Çiftliği mi okumalıyım?"],
+    "note": "Kâşif burada yalnızca bu kitabı yanıtlar; başka konulara seni konsola yönlendirir."
+  },
+  "similar": {
+    "title": "Benzer ama daha…",
+    "sub": "Bu kitaptan yola çık, tek bir eksende değiştir — Kâşif sohbete bu kitabı taşır.",
+    "axes": ["− Daha kısa, tek oturuşta", "+ Daha umutlu bir son", "+ Daha güncel / çağdaş", "− Daha az karanlık", "~ Aynı çevirmenden", "+ Daha felsefi / derin", "~ Yerli bir yazardan"],
+    "note": "Örnek eksenler: gerçek öneriler kitabın künye, tema ve okur-görüşü verisinden türetilir."
+  },
+  "consensus": {
+    "title": "Okurların ortak görüşü",
+    "badge": "8.388 yorumdan AI özeti",
+    "text": "Okurlar en çok düşünsel derinliği ve Celâl Üster çevirisini övüyor; az sayıda okur baskı ve kağıt kalitesinden yakınıyor. Baskın his: tedirgin edici ama sürükleyici.",
+    "chips": ["Düşündürücü", "Sürükleyici", "Tedirgin edici", "Çarpıcı"],
+    "bars": [
+      { "label": "Düşünsel derinlik", "value": 96 },
+      { "label": "Çeviri", "value": 94 },
+      { "label": "Akıcılık / tempo", "value": 88 },
+      { "label": "Baskı & kağıt", "value": 79, "tone": "orange" }
+    ],
+    "note": "Yalnızca gerçek okur yorumlarından damıtıldı; Kâşif kitabı kendi başına yorumlamaz."
+  },
+  "reviews": [
+    { "initials": "DK", "name": "Deniz K.", "date": "14.09.2026", "stars": 5, "text": "Yazıldığı dönemden bugüne hiç eskimemiş bir distopya klasiği. Gözetim ve gerçeğin çarpıtılması üzerine okurken insanı ürperten bir kitap." },
+    { "initials": "MA", "name": "Mert A.", "date": "02.08.2026", "stars": 5, "text": "Celâl Üster çevirisi çok akıcı. Ağır olur diye çekiniyordum ama bir solukta bitirdim; herkese tavsiye ederim." },
+    { "initials": "EY", "name": "Elif Y.", "date": "21.06.2026", "stars": 4, "text": "Dil, bellek ve iktidar üzerine düşündüren güçlü bir roman. Sonu beni uzun süre meşgul etti." }
+  ],
+  "reviewTotal": "Tüm 8.388 yorumu gör"
+}

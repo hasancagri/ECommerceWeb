@@ -1,0 +1,16 @@
+{
+  "total": "16 kitap",
+  "tabs": [
+    { "name": "Okuyacağım", "count": 3 },
+    { "name": "Okuyorum", "count": 2 },
+    { "name": "Okudum", "count": 3 },
+    { "name": "Favoriler", "count": 2 },
+    { "name": "Yorumladıklarım", "count": 3 },
+    { "name": "Yarım Bıraktıklarım", "count": 3 }
+  ],
+  "books": [
+    { "title": "Sapiens", "author": "Yuval Noah Harari", "publisher": "Kolektif Kitap", "added": "Listene eklendi · 12 Ekim" },
+    { "title": "Nutuk", "author": "Mustafa Kemal Atatürk", "publisher": "İş Bankası Kültür", "added": "Listene eklendi · 3 Ekim" },
+    { "title": "Tutunamayanlar", "author": "Oğuz Atay", "publisher": "İletişim Yayınları", "added": "Listene eklendi · 28 Eylül" }
+  ]
+}

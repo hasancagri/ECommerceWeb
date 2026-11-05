@@ -1,0 +1,40 @@
+{
+  "year": "2026",
+  "intro": "Okuma alışkanlıkların Kâşif önerilerini kişiselleştirir.",
+  "stats": [
+    { "label": "BU YIL OKUNAN", "value": "14 kitap", "sub": "▲ geçen yıla göre +3", "subTone": "green" },
+    { "label": "TOPLAM SAYFA", "value": "4.312", "sub": "günde ort. ~38 sayfa" },
+    { "label": "BİTİRME ORANI", "value": "%88", "sub": "başladıklarının" },
+    { "label": "OKUMA TEMPOSU", "value": "Dengeli", "sub": "sürükleyici kurguda hızlı" }
+  ],
+  "badges": {
+    "summary": "8 rozetten 5'i açıldı",
+    "unlocked": [
+      { "name": "İlk Adım", "desc": "İlk kitabın" },
+      { "name": "Onluk Kulüp", "desc": "10 kitap okudun" },
+      { "name": "Tarih Meraklısı", "desc": "5 tarih kitabı" },
+      { "name": "Gece Kuşu", "desc": "00:00 sonrası okuma" },
+      { "name": "Seri Bitirici", "desc": "Bir seriyi tamamladın" }
+    ],
+    "locked": [
+      { "name": "Yüzler Kulübü", "desc": "100 kitaba 86 kaldı" },
+      { "name": "Maratoncu", "desc": "Bir ayda 1500 sayfa" },
+      { "name": "Dünya Turu", "desc": "10 ülkeden yazar" }
+    ]
+  },
+  "challenge": { "title": "2026 Okuma Meydan Okuması", "progress": "14 / 24 kitap", "pct": 58, "note": "Hedefin %58'indesin · yılı bitirmene 10 kitap kaldı, tempon buna uygun." },
+  "genres": [
+    { "name": "Roman", "pct": 40, "tone": "blue" },
+    { "name": "Tarih", "pct": 22, "tone": "teal" },
+    { "name": "Bilim Kurgu", "pct": 15, "tone": "purple" },
+    { "name": "Felsefe", "pct": 12, "tone": "orange" },
+    { "name": "Diğer", "pct": 11, "tone": "slate" }
+  ],
+  "monthly": { "title": "Son 6 ay", "months": ["May", "Haz", "Tem", "Ağu", "Eyl", "Eki"], "counts": [1, 2, 3, 2, 3, 3], "caption": "Aylık okunan kitap sayısı" },
+  "highlights": [
+    ["En çok tür", "Roman"],
+    ["Favori yayınevi", "Can Yayınları"],
+    ["En uzun kitap", "Sapiens · 512 s."],
+    ["Ortalama puanın", "4,6 / 5"]
+  ]
+}

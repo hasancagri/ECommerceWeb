@@ -1,0 +1,15 @@
+{
+  "title": "Ne okumak istediğini anlat, gerisini Kâşif'e bırak.",
+  "subtitle": "Liste ve filtre yok. Ruh halini, bir konuyu ya da sevdiğin bir kitabı yaz; Kâşif 23.600 kitaplık kataloğu senin için okuyup gerekçeli öneriler getirsin.",
+  "chip": "Filtresiz & doğal dil odaklı keşif",
+  "examples": [
+    { "tag": "RUH HALİNE GÖRE", "icon": "sparkles", "text": "“Yoğun bir haftanın ardından beni başka bir dünyaya götürecek bir roman.”" },
+    { "tag": "BENZER KİTAP", "icon": "copy", "text": "“Simyacı'yı çok sevdim, buna benzer ne okumalıyım?”" },
+    { "tag": "KONU & TEMA", "icon": "book", "text": "“Stoacı felsefeye yeni başlayanlar için üç kitap.”" },
+    { "tag": "BÜTÇE & İNDİRİM", "icon": "tag", "text": "“İş Bankası klasiklerinde şu an indirimde olanları göster.”" },
+    { "tag": "SÜREYE GÖRE", "icon": "clock", "text": "“Bir hafta sonunda bitirebileceğim, 250 sayfadan kısa bir kitap.”" },
+    { "tag": "POPÜLERLİK", "icon": "trending", "text": "“Bu ay en çok okunan kurgu-dışı kitaplar neler?”" }
+  ],
+  "inputPlaceholder": "Aradığın kitabı, konuyu ya da ruh halini yaz… örn. “Beni düşündüren, umutlu biten bir roman”",
+  "disclaimer": "Keşif ve sohbet üyeliksiz çalışır. Kâşif hiçbir ekranda işlem/satın alma yaptırmaz."
+}

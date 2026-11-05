@@ -1,0 +1,12 @@
+{
+  "chip": "3–9 Kasım · sana özel",
+  "title": "Bu haftanın seçkisi",
+  "intro": "Okuma profiline, raflarına ve gerçek okur verisine bakarak Kâşif bu hafta 4 kitap seçti. Tarihe yöneldiğini ve felsefi kurguyu sevdiğini dikkate aldım.",
+  "picks": [
+    { "title": "Sapiens", "byline": "Yuval Noah Harari · Kolektif Kitap", "why": "Son aylarda tarihe ve kurgu-dışına yöneldiğini fark ettim; bu, o geçişin en yumuşak kapısı. 1.240 okurun %92'si “akıcı” diyor.", "source": "Kaynak: okuma profilin + 1.240 yorum" },
+    { "title": "Bir İdam Mahkûmunun Son Günü", "byline": "Victor Hugo · Türkiye İş Bankası", "why": "1984'te adalet ve gözetim temasına verdiğin tepkiye yakın; kısa ama vurucu, bir oturuşta biter.", "source": "Kaynak: 1984 okuman + tema eşleşmesi" },
+    { "title": "Cumhuriyet'e Giden Yol", "byline": "İlber Ortaylı · Kronik Kitap", "why": "Osmanlı tarihine hakimsin; yakın tarihe doğal bir köprü. “Dünya tarihine açılmak istiyorum” demiştin, buradan başlayabilirsin.", "source": "Kaynak: okuma profilin + kategori" },
+    { "title": "Bozkırkurdu", "byline": "Hermann Hesse · Can Yayınları", "why": "Felsefi kurguyu sevdiğini biliyoruz; Simyacı'dan sonra bir adım daha derine inmek istersen tam sırası.", "source": "Kaynak: Simyacı/benzerlik + yorumlar" }
+  ],
+  "note": "Seçki; okuma geçmişin, rafların ve gerçek okur yorumlarının üstünde üretilir. Kâşif tanımadığı bir kitap için öneri uydurmaz — yeterli veri yoksa o kitabı hiç önermez."
+}

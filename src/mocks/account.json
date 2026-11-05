@@ -1,0 +1,18 @@
+{
+  "profile": { "name": "Selin Yılmaz", "email": "selin.yilmaz@eposta.com", "member": "Üye · Mart 2025'ten beri" },
+  "security": [
+    { "label": "E-posta adresi", "sub": "selin.yilmaz@eposta.com" },
+    { "label": "Şifre", "sub": "En son 2 ay önce güncellendi" }
+  ],
+  "notifications": [
+    { "label": "Fiyat alarmı e-postaları", "sub": "Takip ettiğin kitap hedefe inince", "on": true },
+    { "label": "Stoğa gelince bildirim", "sub": "Tükenen kitap tekrar stoğa girince", "on": true },
+    { "label": "Kampanya & haber bülteni", "sub": "Yayınevi kampanyaları ve seçkiler", "on": false },
+    { "label": "Sipariş durumu bildirimleri", "sub": "Kargo ve teslim güncellemeleri", "on": true }
+  ],
+  "cards": [
+    { "brand": "VISA", "masked": "•••• •••• •••• 6411", "expiry": "Son kullanma 08/27", "isDefault": true }
+  ],
+  "links": ["Adreslerim", "Siparişlerim"],
+  "language": "Türkçe"
+}

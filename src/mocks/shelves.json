@@ -1,0 +1,9 @@
+{
+  "total": "4 özel liste",
+  "shelves": [
+    { "name": "Kışın okunacaklar", "count": "5 kitap", "books": ["Kozmos", "Sapiens", "Nutuk"], "more": 2 },
+    { "name": "Savaş karşıtı", "count": "3 kitap", "books": ["1984", "Sineklerin Tanrısı", "Hayvan Çiftliği"], "more": 0 },
+    { "name": "Hediye alınacaklar", "count": "2 kitap", "books": ["Simyacı", "Kürk Mantolu Madonna"], "more": 0 },
+    { "name": "Bir solukta bitenler", "count": "4 kitap", "books": ["Simyacı", "Dönüşüm", "Yabancı"], "more": 1 }
+  ]
+}

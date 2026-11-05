@@ -1,0 +1,10 @@
+{
+  "intro": "Ne okuduğun, nerede kaldığın ve aklından geçenler — sadece senin için.",
+  "composerPlaceholder": "Ne okuyorsun, ne düşünüyorsun?",
+  "entries": [
+    { "when": "Bugün · 14:20", "kind": "Durum", "text": "1984'ü okumaya başladım. İlk 50 sayfa şimdiden tedirgin edici — Orwell hiç vakit kaybetmiyor.", "book": "1984", "author": "George Orwell", "likes": 3 },
+    { "when": "2 gün önce", "kind": "Not", "text": "Simyacı bitti. Hafif bir kitap ama tam da ihtiyacım olan şeydi: yola çıkmak üzerine sakin bir hatırlatma.", "book": "Simyacı", "author": "Paulo Coelho", "likes": 7 },
+    { "when": "4 gün önce", "kind": "Durum", "text": "Kozmos'ta %18'deyim; Sagan'ın dili beklediğimden çok daha sıcak, popüler bilimden korkmama gerek yokmuş.", "book": "Kozmos", "author": "Carl Sagan", "likes": 2 },
+    { "when": "1 hafta önce", "kind": "Not", "text": "Tutunamayanlar'ı üçüncü denememde nihayet akıtabildim. Sabır istiyor ama o cümlelere değiyor.", "book": "Tutunamayanlar", "author": "Oğuz Atay", "likes": 11 }
+  ]
+}
