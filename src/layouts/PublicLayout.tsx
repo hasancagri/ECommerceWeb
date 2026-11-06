@@ -1,9 +1,10 @@
-import { Link, NavLink, Outlet, useLocation } from 'react-router'
+import { Link, NavLink, Outlet } from 'react-router'
 import {
   MessageSquare, History, Book, NotebookPen, Layers, Quote, BarChart3,
-  Sparkles, Bell, Heart, Truck, MapPin, Settings, ShoppingCart, Lock,
+  Sparkles, Bell, Heart, Truck, MapPin, Settings, ShoppingCart, Lock, LogOut,
 } from 'lucide-react'
 import { Logo } from '../components/ui'
+import { useAuthSession } from '../auth/useAuthSession'
 
 const assistantNav = [
   { to: '/sohbet', label: 'Aktif Sohbet & Tavsiyeler', icon: MessageSquare },
@@ -52,8 +53,14 @@ function NavItem({ to, label, icon: Icon, badge, guest, locked }: {
 }
 
 export default function PublicLayout() {
-  const { pathname } = useLocation()
-  const guest = pathname === '/' || pathname === '/kesif'
+  const { isAuthenticated, displayName, logout } = useAuthSession()
+  const guest = !isAuthenticated
+  const initials = displayName
+    .split(' ')
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 
   return (
     <div className="min-h-screen">
@@ -65,8 +72,23 @@ export default function PublicLayout() {
             <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[11px] font-bold text-white">3</span>
           </Link>
           <span className="h-6 w-px bg-slate-200" />
-          <Link to="/giris" className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Giriş yap</Link>
-          <Link to="/giris" className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">Kayıt ol</Link>
+          {guest ? (
+            <>
+              <Link to="/giris" className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Giriş yap</Link>
+              <Link to="/giris" className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">Kayıt ol</Link>
+            </>
+          ) : (
+            <>
+              <span className="text-sm font-medium text-slate-700">{displayName}</span>
+              <button
+                type="button"
+                onClick={logout}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                <LogOut size={15} /> Çıkış
+              </button>
+            </>
+          )}
         </div>
       </header>
 
@@ -92,9 +114,9 @@ export default function PublicLayout() {
             </div>
           ) : (
             <div className="flex items-center gap-3 border-t border-slate-200 px-5 py-4">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-sm font-semibold text-teal-700">SY</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-teal-100 text-sm font-semibold text-teal-700">{initials || '•'}</span>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-slate-800">Selin Yılmaz</p>
+                <p className="text-sm font-semibold text-slate-800">{displayName}</p>
                 <p className="flex items-center gap-1.5 text-xs text-slate-500">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> AI Asistan Bağlı
                 </p>

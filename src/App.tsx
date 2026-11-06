@@ -19,7 +19,9 @@ import Shelves from './pages/Shelves'
 import WeeklyPicks from './pages/WeeklyPicks'
 import Addresses from './pages/Addresses'
 import AccountSettings from './pages/AccountSettings'
-import Login from './pages/Login'
+import LoginRedirect from './pages/LoginRedirect'
+import AuthCallback from './pages/AuthCallback'
+import RequireAuth from './auth/RequireAuth'
 import ForgotPassword from './pages/ForgotPassword'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminQueries from './pages/admin/AdminQueries'
@@ -34,26 +36,30 @@ export default function App() {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<DiscoverWelcome />} />
         <Route path="/sohbet" element={<ChatWorkspace />} />
-        <Route path="/sohbet-gecmisi" element={<ChatHistory />} />
         <Route path="/kitap/1984" element={<BookDetail />} />
-        <Route path="/fiyat-alarmlari" element={<PriceAlarms />} />
-        <Route path="/takiplerim" element={<Follows />} />
         <Route path="/sepet" element={<Cart />} />
-        <Route path="/odeme" element={<Checkout />} />
-        <Route path="/siparislerim" element={<OrderConfirmation />} />
-        <Route path="/kitapligim" element={<Library />} />
-        <Route path="/okuma-profilim" element={<ReadingProfile />} />
-        <Route path="/alintilarim" element={<Quotes />} />
-        <Route path="/okuma-gunlugum" element={<Journal />} />
-        <Route path="/raflarim" element={<Shelves />} />
-        <Route path="/haftalik-secki" element={<WeeklyPicks />} />
-        <Route path="/adreslerim" element={<Addresses />} />
-        <Route path="/hesap" element={<AccountSettings />} />
+        {/* Üyelere özel alanlar — girişsiz erişim login akışına yönlenir, dönüşte hedefe gelir. */}
+        <Route element={<RequireAuth />}>
+          <Route path="/sohbet-gecmisi" element={<ChatHistory />} />
+          <Route path="/fiyat-alarmlari" element={<PriceAlarms />} />
+          <Route path="/takiplerim" element={<Follows />} />
+          <Route path="/odeme" element={<Checkout />} />
+          <Route path="/siparislerim" element={<OrderConfirmation />} />
+          <Route path="/kitapligim" element={<Library />} />
+          <Route path="/okuma-profilim" element={<ReadingProfile />} />
+          <Route path="/alintilarim" element={<Quotes />} />
+          <Route path="/okuma-gunlugum" element={<Journal />} />
+          <Route path="/raflarim" element={<Shelves />} />
+          <Route path="/haftalik-secki" element={<WeeklyPicks />} />
+          <Route path="/adreslerim" element={<Addresses />} />
+          <Route path="/hesap" element={<AccountSettings />} />
+        </Route>
       </Route>
       <Route element={<AuthLayout />}>
-        <Route path="/giris" element={<Login />} />
+        <Route path="/giris" element={<LoginRedirect />} />
         <Route path="/sifremi-unuttum" element={<ForgotPassword />} />
       </Route>
+      <Route path="/callback" element={<AuthCallback />} />
       <Route element={<AdminLayout />}>
         <Route path="/yonetim" element={<AdminDashboard />} />
         <Route path="/yonetim/sorgular" element={<AdminQueries />} />
