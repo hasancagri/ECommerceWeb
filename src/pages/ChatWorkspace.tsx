@@ -164,7 +164,7 @@ export default function ChatWorkspace() {
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400 disabled:opacity-60"
-              placeholder="Aradığın kitabı, yazarı ya da konuyu yaz…"
+              placeholder="İstediğini sorabilirsin — kitap, yazar, konu ya da ruh hali…"
             />
             <button type="button" className="p-2 text-slate-400"><Paperclip size={17} /></button>
             <button type="submit" disabled={loading} className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white disabled:opacity-50"><ArrowUp size={18} /></button>

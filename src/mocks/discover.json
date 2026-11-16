@@ -10,6 +10,6 @@
     { "tag": "SÜREYE GÖRE", "icon": "clock", "text": "“Bir hafta sonunda bitirebileceğim, 250 sayfadan kısa bir kitap.”" },
     { "tag": "POPÜLERLİK", "icon": "trending", "text": "“Bu ay en çok okunan kurgu-dışı kitaplar neler?”" }
   ],
-  "inputPlaceholder": "Aradığın kitabı, konuyu ya da ruh halini yaz… örn. “Beni düşündüren, umutlu biten bir roman”",
+  "inputPlaceholder": "İstediğini sorabilirsin… örn. “Orwell’in kitapları” ya da “umutlu biten bir roman”",
   "disclaimer": "Keşif ve sohbet üyeliksiz çalışır. Kâşif hiçbir ekranda işlem/satın alma yaptırmaz."
 }
