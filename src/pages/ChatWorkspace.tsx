@@ -83,11 +83,13 @@ export default function ChatWorkspace() {
     }
   }
 
-  // Açılış: ?q= varsa soruyu otomatik ara (tek sefer).
+  // Açılış: ?q= varsa soruyu otomatik ara (tek sefer). 013 US2: ?mode= varsa o modla (geçmişten tekrar-ara).
   useEffect(() => {
     if (bootstrapped.current) return
     bootstrapped.current = true
     const q = params.get('q')
+    const m = params.get('mode')
+    if (m === 'keyword' || m === 'semantic' || m === 'hybrid') { setMode(m); modeRef.current = m }
     if (q) void send(q)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
