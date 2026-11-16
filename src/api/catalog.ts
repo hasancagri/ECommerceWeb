@@ -30,21 +30,18 @@ async function getJson<T>(path: string): Promise<T> {
   return (await response.json()) as T
 }
 
-// 012: arama app-BFF'ten geçer (/api/discovery/search). Login'de bearer gönderilir → BFF userId'yi
-// çözüp UserSearched yayınlar (Personalization kaydeder). Anonim (token yok) → kaydedilmez, arama çalışır.
+// 012: arama doğrudan Catalog'a gider (/api/catalog/products/search) — app-BFF söküldü. Login'de bearer
+// gönderilir → Catalog userId'yi çözüp UserSearched yayınlar (Personalization kaydeder). Anonim (token
+// yok) → kaydedilmez, arama çalışır.
 export function searchProducts(
   query: string,
   mode: SearchMode = 'keyword',
   limit = 20,
   token?: string,
 ): Promise<ProductSummary[]> {
-  return fetch(`${BASE}/api/discovery/search`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ query, mode, limit }),
+  const qs = new URLSearchParams({ q: query, mode, limit: String(limit) })
+  return fetch(`${BASE}/api/catalog/products/search?${qs}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   }).then((r) => {
     if (!r.ok) throw new CatalogApiError(r.status, `İstek başarısız (${r.status})`)
     return r.json() as Promise<ProductSummary[]>
