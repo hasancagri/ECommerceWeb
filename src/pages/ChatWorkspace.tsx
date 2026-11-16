@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, Type, Layers } from 'lucide-react'
 import { Crumb } from '../components/ui'
 import { searchProducts, CatalogApiError, type ProductSummary, type SearchMode } from '../api/catalog'
+import { useAuthSession } from '../auth/useAuthSession'
 
 // 011 canlı test: ilk-sayfa arama (DiscoverWelcome input/kart → /sohbet?q=) gerçek Catalog hibrit
 // arama endpoint'ine vurur (ScoutAgent sohbet omurgası master'da YOK — doğrudan REST). Üç mod
@@ -49,6 +50,7 @@ function BookCard({ book }: { book: ProductSummary }) {
 
 export default function ChatWorkspace() {
   const [params] = useSearchParams()
+  const { accessToken, isAuthenticated } = useAuthSession()
   const [messages, setMessages] = useState<Msg[]>([])
   const [input, setInput] = useState('')
   const [mode, setMode] = useState<SearchMode>('keyword')
@@ -65,7 +67,7 @@ export default function ChatWorkspace() {
     setMessages((m) => [...m, { role: 'user', text: trimmed }])
     setLoading(true)
     try {
-      const books = await searchProducts(trimmed, activeMode, 20)
+      const books = await searchProducts(trimmed, activeMode, 20, isAuthenticated ? accessToken : undefined)
       const label = MODES.find((x) => x.id === activeMode)?.label ?? activeMode
       const text = books.length === 0
         ? `“${trimmed}” için ${label} aramasında sonuç bulamadım.`
