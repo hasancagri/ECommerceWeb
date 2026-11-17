@@ -66,10 +66,14 @@ function AgentText({ text }: { text: string }) {
     <div className="prose prose-sm max-w-none prose-p:my-1 prose-li:my-0.5">
       <ReactMarkdown
         components={{
+          // Kapak resmi gömülmez (agent artık ![] üretmez; eski cevaplar için link'e düşür).
           img: ({ src, alt }) => src
             ? <a href={String(src)} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{alt || 'Kapak'}</a>
             : null,
-          a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{children}</a>,
+          // İç rota (/kitap/...) → router Link (SPA gezinme); dış URL → yeni sekme.
+          a: ({ href, children }) => href && href.startsWith('/')
+            ? <Link to={href} className="font-medium text-primary hover:underline">{children}</Link>
+            : <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{children}</a>,
         }}
       >
         {text}
