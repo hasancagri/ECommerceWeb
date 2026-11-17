@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
-import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen } from 'lucide-react'
-import { Crumb } from '../components/ui'
-import { sendMessage, getConversation, ChatApiError, type ReplyItem, type HistoryTurn } from '../api/chat'
+import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen, Plus } from 'lucide-react'
+import { sendMessage, getConversation, listConversations, ChatApiError, type ReplyItem, type HistoryTurn } from '../api/chat'
 import { useAuthSession } from '../auth/useAuthSession'
+import { listAnon, getAnon, saveAnon } from '../lib/anonChats'
 
 // 014: ScoutAgent (Kâşif) sohbeti — mesaj-güdümlü (POST /api/chat/v1/messages). Arama artık agent'ın
 // MCP tool'undan geçer (search_books/get_book…); ?q= URL YOK — ilk mesaj router state'iyle gelir.
@@ -252,11 +252,15 @@ function ToolItem({ item }: { item: ReplyItem }) {
   }
 }
 
+interface ConvoSummary { id: string; title: string; updatedAt: string }
+
 export default function ChatWorkspace() {
   const location = useLocation()
   const [params] = useSearchParams()
   const { accessToken, isAuthenticated } = useAuthSession()
   const [messages, setMessages] = useState<Msg[]>([])
+  const [convos, setConvos] = useState<ConvoSummary[]>([])
+  const [activeId, setActiveId] = useState<string | undefined>(undefined)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const conversationId = useRef<string | undefined>(undefined)
@@ -264,22 +268,61 @@ export default function ChatWorkspace() {
   const messagesRef = useRef<Msg[]>([])
   messagesRef.current = messages
 
+  // Sidebar listesi: login → sunucu Conversation'ları; anon → sessionStorage (misafir, geçici).
+  const refreshList = useCallback(async () => {
+    if (isAuthenticated && accessToken) {
+      try { const r = await listConversations(accessToken); setConvos(r.conversations) }
+      catch { setConvos([]) }
+    } else {
+      setConvos(listAnon().map((c) => ({ id: c.id, title: c.title, updatedAt: c.updatedAt })))
+    }
+  }, [isAuthenticated, accessToken])
+
+  function newChat() {
+    conversationId.current = undefined
+    setActiveId(undefined)
+    setMessages([])
+    setInput('')
+  }
+
+  async function openConvo(id: string) {
+    conversationId.current = id
+    setActiveId(id)
+    if (isAuthenticated && accessToken) {
+      try {
+        const c = await getConversation(id, accessToken)
+        setMessages(c.messages.map((m) => ({ role: m.role === 'assistant' ? 'assistant' : 'user', text: m.text })))
+      } catch { setMessages([]) }
+    } else {
+      const c = getAnon(id)
+      setMessages(c?.messages.map((m) => ({ role: m.role, text: m.text, items: m.items, error: m.error })) ?? [])
+    }
+  }
+
   async function send(text: string) {
     const trimmed = text.trim()
     if (!trimmed || loading) return
     setInput('')
-    setMessages((m) => [...m, { role: 'user', text: trimmed }])
+    const prior = messagesRef.current
+    const userMsg: Msg = { role: 'user', text: trimmed }
+    setMessages([...prior, userMsg])
     setLoading(true)
     try {
-      // Anon devamlılık: önceki turların TAMAMINI history'de yolla (başından sonuna; login'de sunucu otoriter).
-      const history: HistoryTurn[] = messagesRef.current
-        .map((m) => ({ role: m.role, text: m.text }))
+      // Tam transkript (başından sonuna) history'de; login'de sunucu otoriter, anon'da bağlam buradan.
+      const history: HistoryTurn[] = prior.map((m) => ({ role: m.role, text: m.text }))
       const res = await sendMessage(
         { conversationId: conversationId.current, message: trimmed, history },
         isAuthenticated ? accessToken : undefined,
       )
       conversationId.current = res.conversationId
-      setMessages((m) => [...m, { role: 'assistant', text: res.reply.text, items: res.reply.items }])
+      setActiveId(res.conversationId)
+      const asstMsg: Msg = { role: 'assistant', text: res.reply.text, items: res.reply.items }
+      const full = [...prior, userMsg, asstMsg]
+      setMessages(full)
+      // Anon → sessionStorage'a yaz (login'de sunucu zaten kaydetti). Sidebar'ı tazele.
+      if (!isAuthenticated)
+        saveAnon(res.conversationId, full.map((m) => ({ role: m.role, text: m.text, items: m.items, error: m.error })))
+      void refreshList()
     } catch (err) {
       const msg = err instanceof ChatApiError && err.status === 503
         ? 'Kâşif şu an hizmet veremiyor, biraz sonra tekrar dene.'
@@ -290,32 +333,45 @@ export default function ChatWorkspace() {
     }
   }
 
-  // Açılış (tek sefer): router state.message varsa otomatik gönder (DiscoverWelcome / geçmişten tekrar-ara).
-  // ?c=<id> varsa ve login ise kayıtlı sohbeti yükle (resume — bu kaynak-kimliği, arama sorgusu değil).
+  // Açılış (tek sefer): sidebar listesini çek; ?c=<id> → o sohbeti aç (login sunucu / anon sessionStorage);
+  // router state.message → yeni sohbette otomatik gönder (DiscoverWelcome / geçmişten tekrar-ara).
   useEffect(() => {
     if (bootstrapped.current) return
     bootstrapped.current = true
+    void refreshList()
 
     const resumeId = params.get('c')
     const initial = (location.state as { message?: string } | null)?.message
-
-    if (resumeId && isAuthenticated && accessToken) {
-      conversationId.current = resumeId
-      void getConversation(resumeId, accessToken)
-        .then((c) => setMessages(c.messages.map((m) => ({
-          role: m.role === 'assistant' ? 'assistant' : 'user', text: m.text,
-        }))))
-        .catch(() => { /* yüklenemezse boş sohbet */ })
-      return
-    }
+    if (resumeId) { void openConvo(resumeId); return }
     if (initial) void send(initial)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] flex-col">
-      <Crumb items={[{ label: 'Kâşif', to: '/' }, { label: 'Sohbet' }]} />
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-8 py-6">
+    <div className="flex min-h-[calc(100vh-4rem)]">
+      {/* Sol: sohbet listesi (Claude-Desktop düzeni) */}
+      <aside className="flex w-64 shrink-0 flex-col border-r border-slate-200 bg-white/60">
+        <button onClick={newChat}
+          className="m-3 flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark">
+          <Plus size={16} /> Yeni sohbet
+        </button>
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
+          {convos.length === 0
+            ? <p className="px-3 py-2 text-xs text-slate-400">{isAuthenticated ? 'Henüz sohbetin yok.' : 'Misafir sohbetlerin bu oturumda tutulur.'}</p>
+            : convos.map((c) => (
+              <button key={c.id} onClick={() => void openConvo(c.id)}
+                className={`mb-1 flex w-full items-center gap-2 truncate rounded-lg px-3 py-2 text-left text-sm ${
+                  c.id === activeId ? 'bg-blue-50 font-medium text-primary' : 'text-slate-600 hover:bg-slate-100'
+                }`}>
+                <MessageSquare size={14} className="shrink-0 text-slate-400" />
+                <span className="truncate">{c.title}</span>
+              </button>
+            ))}
+        </div>
+      </aside>
+
+      {/* Sağ: aktif sohbet */}
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-8 py-6">
         <span className="flex w-fit items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
           <Sparkles size={14} /> Kâşif — kitap, sepet, sipariş… ne sorarsan
         </span>
