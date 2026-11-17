@@ -87,7 +87,9 @@ function BookCard({ book }: { book: ToolBook }) {
   const title = book.title ?? 'Kitap'
   return (
     <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-primary"><BookOpen size={16} /></span>
+      {book.coverUrl
+        ? <img src={book.coverUrl} alt="" loading="lazy" className="h-20 w-14 shrink-0 rounded object-cover" />
+        : <span className="flex h-20 w-14 shrink-0 items-center justify-center rounded bg-blue-50 text-primary"><BookOpen size={18} /></span>}
       <div className="min-w-0">
         {isbn
           ? <Link to={`/kitap/${isbn}`} className="font-semibold text-slate-800 hover:text-primary hover:underline">{title}</Link>
