@@ -1,11 +1,18 @@
-// 007 US3: ScoutAgent (Kâşif) chat API istemcisi. Tek origin = Gateway (VITE_API_BASE_URL).
-// Bearer opsiyonel: varsa kişisel araçlar + kalıcı sohbet; yoksa anonim katalog sohbeti.
-const BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5060'
+// 007/014: ScoutAgent (Kâşif) chat API istemcisi. Tek origin = Gateway /api/chat/**.
+// BASE boşsa vite proxy (:5173 → gateway); env varsa onu kullanır (catalog.ts ile aynı desen).
+// Bearer opsiyonel: varsa kişisel araçlar + kalıcı sohbet; yoksa anonim sohbet (istemci-transkript).
+const BASE = import.meta.env.VITE_API_BASE_URL ?? ''
 
 export interface ReplyItem {
   tool: string
   // Tool dönüşünden BİREBİR ham sonuç (search_books → {items,total,page}, get_book → kitap, vb.).
   result: unknown
+}
+
+// 014: anon istemci-transkript turu (devamlılık/sayfalama bağlamı). Login'de sunucu kaydı otoriter.
+export interface HistoryTurn {
+  role: 'user' | 'assistant'
+  text: string
 }
 
 export interface ChatReply {
@@ -51,7 +58,7 @@ async function request<T>(path: string, init: RequestInit, token?: string): Prom
 }
 
 export function sendMessage(
-  body: { conversationId?: string; message: string },
+  body: { conversationId?: string; message: string; history?: HistoryTurn[] },
   token?: string,
 ): Promise<SendMessageResult> {
   return request<SendMessageResult>(

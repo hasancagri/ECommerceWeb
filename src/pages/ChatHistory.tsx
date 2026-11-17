@@ -38,8 +38,9 @@ export default function ChatHistory() {
   useEffect(() => { loadSearch() }, [loadSearch])
 
   // Öğeye tıkla → arama ekranına git, o sorgu+mod ile çalıştır.
+  // 014: tekrar-ara URL değil, sohbete mesaj (router state → ChatWorkspace otomatik gönderir).
   function reSearch(item: SearchHistoryItem) {
-    navigate(`/sohbet?q=${encodeURIComponent(item.query)}&mode=${item.mode}`)
+    navigate('/sohbet', { state: { message: item.query } })
   }
 
   async function removeItem(item: SearchHistoryItem) {

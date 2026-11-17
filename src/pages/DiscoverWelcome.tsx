@@ -13,9 +13,10 @@ const iconTones: Record<string, string> = {
   tag: 'bg-orange-50 text-orange-600', clock: 'bg-sky-50 text-sky-600', trending: 'bg-teal-50 text-teal-600',
 }
 
-// Kartın sorusu/girdi → sohbet ekranı ?q= ile açılır (ChatWorkspace otomatik gönderir).
+// Kartın sorusu/girdi → sohbet ekranı router state'iyle açılır (ChatWorkspace otomatik gönderir).
+// 014: ?q= URL YOK — sorgu URL'de taşınmaz, mesaj-güdümlü sohbet.
 function toChat(navigate: ReturnType<typeof useNavigate>, question: string) {
-  navigate(`/sohbet?q=${encodeURIComponent(question)}`)
+  navigate('/sohbet', { state: { message: question } })
 }
 
 export default function DiscoverWelcome() {
