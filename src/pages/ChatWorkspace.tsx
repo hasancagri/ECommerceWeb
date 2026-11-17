@@ -271,9 +271,8 @@ export default function ChatWorkspace() {
     setMessages((m) => [...m, { role: 'user', text: trimmed }])
     setLoading(true)
     try {
-      // Anon devamlılık: önceki turların metnini (son N) history'de yolla (login'de sunucu otoriter).
+      // Anon devamlılık: önceki turların TAMAMINI history'de yolla (başından sonuna; login'de sunucu otoriter).
       const history: HistoryTurn[] = messagesRef.current
-        .slice(-10)
         .map((m) => ({ role: m.role, text: m.text }))
       const res = await sendMessage(
         { conversationId: conversationId.current, message: trimmed, history },
