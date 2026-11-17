@@ -35,7 +35,9 @@ export interface ConversationSummary {
 export interface ConversationDetail {
   id: string
   title: string
-  messages: { role: string; text: string; createdAt: string }[]
+  // itemsJson: assistant mesajlarında opsiyonel — kaydedilmiş ReplyItem[]'in JSON string'i
+  // (canlı reply.items ile aynı şekil). JSON.parse ile kart render'a geri döner (T009).
+  messages: { role: string; text: string; createdAt: string; itemsJson?: string }[]
 }
 
 export class ChatApiError extends Error {
@@ -81,6 +83,22 @@ export function getConversation(id: string, token: string): Promise<Conversation
   return request<ConversationDetail>(
     `/api/chat/v1/conversations/${id}`,
     { method: 'GET' },
+    token,
+  )
+}
+
+export function renameConversation(id: string, title: string, token: string): Promise<void> {
+  return request<void>(
+    `/api/chat/v1/conversations/${id}`,
+    { method: 'PATCH', body: JSON.stringify({ title }) },
+    token,
+  )
+}
+
+export function deleteConversation(id: string, token: string): Promise<void> {
+  return request<void>(
+    `/api/chat/v1/conversations/${id}`,
+    { method: 'DELETE' },
     token,
   )
 }

@@ -66,3 +66,13 @@ export function saveAnon(id: string, messages: StoredMsg[], smartTitle?: string 
 export function deleteAnon(id: string): void {
   write(read().filter((c) => c.id !== id))
 }
+
+// Başlığı güncelle (sidebar yeniden adlandırma; anon tarafı sunucu çağrısı yok).
+export function renameAnon(id: string, title: string): void {
+  const list = read()
+  const idx = list.findIndex((c) => c.id === id)
+  if (idx >= 0) {
+    list[idx] = { ...list[idx], title }
+    write(list)
+  }
+}
