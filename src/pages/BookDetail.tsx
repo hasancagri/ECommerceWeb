@@ -4,6 +4,7 @@ import { ArrowLeft, BookOpen, Loader2, AlertCircle, ShoppingCart, Lock } from 'l
 import { Crumb, Stars, Pill } from '../components/ui'
 import { useAuthSession } from '../auth/useAuthSession'
 import { getProductByIsbn, type BookDetailDto } from '../api/catalog'
+import { getBookReviews, type BookReviews } from '../api/reviews'
 
 // 015/018: gerçek kitap detayı. URL /kitap/{slug}-{isbn} — slug kozmetik, ISBN anahtar.
 function isbnFromSlug(slug: string | undefined): string | undefined {
@@ -35,6 +36,7 @@ export default function BookDetail() {
   const { isAuthenticated } = useAuthSession()
   const [book, setBook] = useState<BookDetailDto | null>(null)
   const [state, setState] = useState<'loading' | 'ok' | 'notfound' | 'error'>('loading')
+  const [reviews, setReviews] = useState<BookReviews | null>(null)
 
   useEffect(() => {
     if (!isbn) { setState('notfound'); return }
@@ -55,6 +57,12 @@ export default function BookDetail() {
       })
       .catch(() => setState('error'))
   }, [isbn])
+
+  // 018 Slice 2: kitap yüklenince yorumları çek (productId = book.id). Hata/boş → sessizce boş durum.
+  useEffect(() => {
+    if (!book) return
+    getBookReviews(book.id, 1).then(setReviews).catch(() => setReviews(null))
+  }, [book])
 
   const discounted = book && book.price != null && book.discountRate
     ? Math.round(book.price * (1 - book.discountRate) * 100) / 100
@@ -174,6 +182,42 @@ export default function BookDetail() {
                   <p className="leading-relaxed text-slate-600">{book.description}</p>
                 </section>
               )}
+
+              {/* Okur yorumları (018 Slice 2) — sade; AI özet/sentiment YOK */}
+              <section className="mt-8 border-t border-slate-200 pt-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-bold tracking-tight text-slate-900">Okur Yorumları</h2>
+                  {reviews && reviews.count > 0 && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Stars value={reviews.average} />
+                      <span className="font-semibold text-slate-800">{reviews.average.toFixed(1)}</span>
+                      <span className="text-slate-400">({reviews.count.toLocaleString('tr-TR')} yorum)</span>
+                    </div>
+                  )}
+                </div>
+
+                {!reviews || reviews.count === 0 ? (
+                  <p className="mt-4 text-sm text-slate-400">Henüz yorum yok. İlk yorumu satın alanlar yazabilir.</p>
+                ) : (
+                  <>
+                    <div className="mt-4 space-y-4">
+                      {reviews.items.map((r, i) => (
+                        <div key={i} className="rounded-2xl border border-slate-200 bg-white p-4">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-slate-800">{r.author}</span>
+                            <span className="text-xs text-slate-400">{formatDate(r.createdAt)}</span>
+                          </div>
+                          <div className="mt-1"><Stars value={r.rating} size={13} /></div>
+                          {r.text && <p className="mt-2 text-sm leading-relaxed text-slate-600">{r.text}</p>}
+                        </div>
+                      ))}
+                    </div>
+                    {reviews.count > reviews.items.length && (
+                      <p className="mt-3 text-xs text-slate-400">İlk {reviews.items.length} yorum gösteriliyor · toplam {reviews.count}.</p>
+                    )}
+                  </>
+                )}
+              </section>
             </div>
 
             {/* ── Satın alma rayı (sticky) ── */}
