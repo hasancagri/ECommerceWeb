@@ -192,7 +192,7 @@ function ToolItem({ item }: { item: ReplyItem }) {
       const to = (page - 1) * pageSize + books.length
       return (
         <>
-          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="mt-3 space-y-2">
             {books.map((b, i) => <BookCard key={b.id ?? i} book={b} />)}
           </div>
           {item.tool === 'search_books' && typeof total === 'number' && total > books.length && (
