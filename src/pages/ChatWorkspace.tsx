@@ -427,6 +427,7 @@ export default function ChatWorkspace() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
+              maxLength={2000}
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400 disabled:opacity-60"
               placeholder="İstediğini sorabilirsin — kitap, yazar, konu, sepetin…"
             />
