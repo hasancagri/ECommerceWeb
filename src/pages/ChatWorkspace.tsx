@@ -21,6 +21,7 @@ interface ToolBook {
   id?: string
   title?: string
   authors?: string
+  publisher?: string
   price?: number | null
   isSalable?: boolean
   coverUrl?: string | null
@@ -37,6 +38,7 @@ function normalizeBook(raw: unknown): ToolBook {
     id: pick<string>(o, 'id', 'Id'),
     title: pick<string>(o, 'title', 'Title'),
     authors: pick<string>(o, 'authors', 'Authors'),
+    publisher: pick<string>(o, 'publisher', 'Publisher'),
     price: pick<number>(o, 'price', 'Price') ?? null,
     isSalable: pick<boolean>(o, 'isSalable', 'IsSalable'),
     coverUrl: pick<string>(o, 'coverUrl', 'CoverUrl') ?? null,
@@ -95,6 +97,7 @@ function BookCard({ book }: { book: ToolBook }) {
           ? <Link to={`/kitap/${isbn}`} className="font-semibold text-slate-800 hover:text-primary hover:underline">{title}</Link>
           : <span className="font-semibold text-slate-800">{title}</span>}
         {book.authors && <p className="text-xs text-slate-500">{book.authors}</p>}
+        {book.publisher && <p className="text-xs text-slate-400">{book.publisher}</p>}
         <p className="mt-1 text-sm">
           {typeof book.price === 'number' && book.price > 0
             ? <span className="font-medium text-slate-700">{book.price.toLocaleString('tr-TR')} ₺</span>
