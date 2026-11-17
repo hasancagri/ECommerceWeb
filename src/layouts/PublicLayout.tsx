@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router'
 import {
   MessageSquare, History, Book, NotebookPen, Layers, Quote, BarChart3,
-  Sparkles, Bell, Heart, Truck, MapPin, Settings, ShoppingCart, Lock, LogOut, Search,
+  Sparkles, Bell, Heart, Truck, MapPin, Settings, ShoppingCart, Lock, LogOut,
 } from 'lucide-react'
 import { Logo } from '../components/ui'
 import { useAuthSession } from '../auth/useAuthSession'
@@ -9,7 +9,6 @@ import { useAuthSession } from '../auth/useAuthSession'
 const assistantNav = [
   { to: '/sohbet', label: 'Aktif Sohbet & Tavsiyeler', icon: MessageSquare },
   { to: '/sohbet-gecmisi', label: 'Sohbet Geçmişi', icon: History, locked: true },
-  { to: '/arama-gecmisim', label: 'Arama Geçmişim', icon: Search, locked: true },
 ]
 
 const personalNav = [
