@@ -55,14 +55,26 @@ export function similarProducts(isbn: string, limit = 10): Promise<ProductSummar
 // 015: tek kitap detayı (GetBook.Response — camelCase). Detay sayfası ISBN'le çeker.
 export interface BookDetailDto {
   id: string
+  isbn: string
   title: string
   authors: string
+  translators: string[]
   publisher: string | null
   category: string | null
-  price: number | null
+  categoryChain: string[]        // üst→alt
+  relatedCategories: string[]
+  tags: string[]                 // etiket + bağlı ekoller
+  price: number | null           // liste fiyatı
+  discountRate: number | null    // etkin indirim oranı (0-1), varsa
+  stockCount: number
   isSalable: boolean
   pageCount: number | null
+  publishedOn: string | null     // ISO date
   language: string | null
+  binding: string | null         // cilt tipi
+  rating: number | null          // 0-5 snapshot
+  ratingCount: number            // değerlendirme sayısı snapshot
+  purchaseCount: number          // "X adet satın alındı" snapshot
   coverUrl: string | null
   description: string
 }
