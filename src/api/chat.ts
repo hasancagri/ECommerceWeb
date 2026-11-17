@@ -22,6 +22,7 @@ export interface ChatReply {
 
 export interface SendMessageResult {
   conversationId: string
+  title?: string | null   // 014: ilk turda üretilen akıllı başlık (anon sessionStorage'a yazar)
   reply: ChatReply
 }
 

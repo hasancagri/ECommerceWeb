@@ -46,11 +46,13 @@ export function getAnon(id: string): AnonConvo | undefined {
   return read().find((c) => c.id === id)
 }
 
-// Aktif sohbeti kaydet/güncelle (başlık ilk kullanıcı mesajından türetilir).
-export function saveAnon(id: string, messages: StoredMsg[]): void {
+// Aktif sohbeti kaydet/güncelle. Başlık: sunucu akıllı başlık döndürdüyse (smartTitle) onu, yoksa
+// ilk kullanıcı mesajını kullanır. Mevcut başlık varsa korunur (ilk turda bir kez belirlenir).
+export function saveAnon(id: string, messages: StoredMsg[], smartTitle?: string | null): void {
   const list = read()
   const firstUser = messages.find((m) => m.role === 'user')?.text ?? 'Sohbet'
-  const title = firstUser.length > 60 ? firstUser.slice(0, 60).trimEnd() + '…' : firstUser
+  const fallback = firstUser.length > 60 ? firstUser.slice(0, 60).trimEnd() + '…' : firstUser
+  const title = (smartTitle && smartTitle.trim()) || fallback
   const updatedAt = new Date().toISOString()
   const idx = list.findIndex((c) => c.id === id)
   if (idx >= 0) {

@@ -321,7 +321,7 @@ export default function ChatWorkspace() {
       setMessages(full)
       // Anon → sessionStorage'a yaz (login'de sunucu zaten kaydetti). Sidebar'ı tazele.
       if (!isAuthenticated)
-        saveAnon(res.conversationId, full.map((m) => ({ role: m.role, text: m.text, items: m.items, error: m.error })))
+        saveAnon(res.conversationId, full.map((m) => ({ role: m.role, text: m.text, items: m.items, error: m.error })), res.title)
       void refreshList()
     } catch (err) {
       const msg = err instanceof ChatApiError && err.status === 503
