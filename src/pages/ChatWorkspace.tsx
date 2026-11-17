@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocation, useSearchParams } from 'react-router'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen } from 'lucide-react'
 import { Crumb } from '../components/ui'
@@ -70,19 +70,116 @@ function BookCard({ book }: { book: ToolBook }) {
   )
 }
 
-// Tool adına göre kart render dağıtıcısı. US1: search_books/get_book → kitap kartları.
-// Bilinmeyen/henüz-UI'sız tool → sessiz (metin cevap yeterli). US2'de sepet/sipariş/… eklenir.
+// — US2 kart yardımcıları (casing defansif: MCP/STJ camel|Pascal) —
+function rows(item: ReplyItem, ...keys: string[]): Record<string, unknown>[] {
+  const r = (item.result ?? {}) as Record<string, unknown>
+  const arr = pick<unknown[]>(r, ...keys) ?? []
+  return Array.isArray(arr) ? (arr as Record<string, unknown>[]) : []
+}
+
+function Shell({ children }: { children: ReactNode }) {
+  return <div className="mt-3 space-y-2">{children}</div>
+}
+function LineCard({ children }: { children: ReactNode }) {
+  return <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">{children}</div>
+}
+
+function BasketCard({ item }: { item: ReplyItem }) {
+  const items = rows(item, 'items', 'Items')
+  const r = (item.result ?? {}) as Record<string, unknown>
+  const totalPrice = pick<number>(r, 'totalPrice', 'TotalPrice')
+  if (items.length === 0) return <p className="mt-3 text-sm text-slate-400">Sepetin boş görünüyor.</p>
+  return (
+    <Shell>
+      {items.map((it, i) => (
+        <LineCard key={i}>
+          <span className="min-w-0 truncate font-medium text-slate-800">{pick<string>(it, 'name', 'Name') ?? 'Ürün'}</span>
+          <span className="shrink-0 text-slate-500">{pick<number>(it, 'quantity', 'Quantity')} ad · {Number(pick<number>(it, 'price', 'Price') ?? 0).toLocaleString('tr-TR')} ₺</span>
+        </LineCard>
+      ))}
+      {typeof totalPrice === 'number' && <p className="pt-1 text-right text-sm font-semibold text-slate-700">Toplam: {totalPrice.toLocaleString('tr-TR')} ₺</p>}
+    </Shell>
+  )
+}
+
+function OrdersCard({ item }: { item: ReplyItem }) {
+  const orders = rows(item, 'orders', 'Orders')
+  if (orders.length === 0) return <p className="mt-3 text-sm text-slate-400">Henüz siparişin yok.</p>
+  return (
+    <Shell>
+      {orders.map((o, i) => (
+        <LineCard key={i}>
+          <span className="font-medium text-slate-800">#{pick<string>(o, 'orderNo', 'OrderNo')}</span>
+          <span className="shrink-0 text-slate-500">{pick<string>(o, 'status', 'Status')} · {Number(pick<number>(o, 'total', 'Total') ?? 0).toLocaleString('tr-TR')} ₺</span>
+        </LineCard>
+      ))}
+    </Shell>
+  )
+}
+
+function AddressesCard({ item }: { item: ReplyItem }) {
+  const addr = rows(item, 'addresses', 'Addresses')
+  if (addr.length === 0) return <p className="mt-3 text-sm text-slate-400">Kayıtlı adresin yok.</p>
+  return (
+    <Shell>
+      {addr.map((a, i) => (
+        <div key={i} className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+          <p className="text-slate-700">{[pick<string>(a, 'line', 'Line'), pick<string>(a, 'street', 'Street'), pick<string>(a, 'district', 'District'), pick<string>(a, 'province', 'Province')].filter(Boolean).join(', ')}</p>
+          {(pick<boolean>(a, 'isDefault', 'IsDefault')) && <span className="mt-1 inline-block rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">Varsayılan</span>}
+        </div>
+      ))}
+    </Shell>
+  )
+}
+
+function LibraryCard({ item }: { item: ReplyItem }) {
+  const r = (item.result ?? {}) as Record<string, unknown>
+  const total = pick<number>(r, 'total', 'Total') ?? rows(item, 'items', 'Items').length
+  return <p className="mt-3 text-sm text-slate-600">Kitaplığında <span className="font-semibold">{total}</span> kayıt var.</p>
+}
+
+function ReviewsCard({ item }: { item: ReplyItem }) {
+  const r = (item.result ?? {}) as Record<string, unknown>
+  const items = rows(item, 'items', 'Items')
+  const average = pick<number>(r, 'average', 'Average')
+  const count = pick<number>(r, 'count', 'Count') ?? items.length
+  return (
+    <Shell>
+      {typeof average === 'number' && count > 0 && (
+        <p className="text-sm text-slate-600">Ortalama <span className="font-semibold">{average.toFixed(1)}</span> / 5 · {count} yorum</p>
+      )}
+      {items.map((v, i) => (
+        <div key={i} className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+          <p className="font-medium text-amber-600">{'★'.repeat(Math.round(Number(pick<number>(v, 'rating', 'Rating') ?? 0)))}</p>
+          {pick<string>(v, 'text', 'Text') && <p className="mt-1 text-slate-700">{pick<string>(v, 'text', 'Text')}</p>}
+          <p className="mt-1 text-xs text-slate-400">{pick<string>(v, 'author', 'Author')}</p>
+        </div>
+      ))}
+      {items.length === 0 && <p className="text-sm text-slate-400">Bu kitaba henüz yorum yok.</p>}
+    </Shell>
+  )
+}
+
+// Tool adına göre kart render dağıtıcısı (tek sohbet akışı). Bilinmeyen tool → sessiz (metin yeter).
 function ToolItem({ item }: { item: ReplyItem }) {
-  if (item.tool === 'search_books' || item.tool === 'get_book') {
-    const books = booksFromItem(item)
-    if (books.length === 0) return null
-    return (
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-        {books.map((b, i) => <BookCard key={b.id ?? i} book={b} />)}
-      </div>
-    )
+  switch (item.tool) {
+    case 'search_books':
+    case 'get_book': {
+      const books = booksFromItem(item)
+      if (books.length === 0) return null
+      return (
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {books.map((b, i) => <BookCard key={b.id ?? i} book={b} />)}
+        </div>
+      )
+    }
+    case 'get_basket': return <BasketCard item={item} />
+    case 'get_my_orders': return <OrdersCard item={item} />
+    case 'get_my_addresses': return <AddressesCard item={item} />
+    case 'get_my_library': return <LibraryCard item={item} />
+    case 'get_book_reviews': return <ReviewsCard item={item} />
+    default: return null
   }
-  return null
 }
 
 export default function ChatWorkspace() {
