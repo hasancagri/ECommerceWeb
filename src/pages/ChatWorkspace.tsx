@@ -160,6 +160,22 @@ function ReviewsCard({ item }: { item: ReplyItem }) {
   )
 }
 
+function SearchHistoryCard({ item }: { item: ReplyItem }) {
+  const items = rows(item, 'data', 'Data')
+  if (items.length === 0) return <p className="mt-3 text-sm text-slate-400">Henüz arama geçmişin yok.</p>
+  return (
+    <Shell>
+      {items.map((h, i) => (
+        <LineCard key={i}>
+          <span className="min-w-0 truncate font-medium text-slate-800">{pick<string>(h, 'query', 'Query')}</span>
+          <span className="shrink-0 text-xs text-slate-400">{pick<number>(h, 'count', 'Count')}× arama</span>
+        </LineCard>
+      ))}
+      <p className="pt-1 text-xs text-slate-400">Silmek için arama geçmişi ekranını kullan.</p>
+    </Shell>
+  )
+}
+
 // Tool adına göre kart render dağıtıcısı (tek sohbet akışı). Bilinmeyen tool → sessiz (metin yeter).
 function ToolItem({ item }: { item: ReplyItem }) {
   switch (item.tool) {
@@ -192,6 +208,7 @@ function ToolItem({ item }: { item: ReplyItem }) {
     case 'get_my_addresses': return <AddressesCard item={item} />
     case 'get_my_library': return <LibraryCard item={item} />
     case 'get_book_reviews': return <ReviewsCard item={item} />
+    case 'get_search_history': return <SearchHistoryCard item={item} />
     default: return null
   }
 }
