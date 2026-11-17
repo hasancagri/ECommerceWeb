@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
+import ReactMarkdown from 'react-markdown'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen } from 'lucide-react'
 import { Crumb } from '../components/ui'
 import { sendMessage, getConversation, ChatApiError, type ReplyItem, type HistoryTurn } from '../api/chat'
@@ -55,6 +56,26 @@ function isbnFromCover(coverUrl?: string | null): string | undefined {
   if (!coverUrl) return undefined
   const seg = coverUrl.split('?')[0].split('/').pop()
   return seg && /^\d{10,13}$/.test(seg) ? seg : undefined
+}
+
+// Agent cevabı markdown render edilir — ama kapak `![alt](url)` RESİM olarak GÖMÜLMEZ; tıklanabilir
+// LİNK'e çevrilir ("Kapak"). Linkler yeni sekmede açılır. (MAF items'ı boş dönebildiğinden metin
+// birincil yüzey; kartlar dolduğunda ek olarak altta görünür.)
+function AgentText({ text }: { text: string }) {
+  return (
+    <div className="prose prose-sm max-w-none prose-p:my-1 prose-li:my-0.5">
+      <ReactMarkdown
+        components={{
+          img: ({ src, alt }) => src
+            ? <a href={String(src)} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{alt || 'Kapak'}</a>
+            : null,
+          a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{children}</a>,
+        }}
+      >
+        {text}
+      </ReactMarkdown>
+    </div>
+  )
 }
 
 function BookCard({ book }: { book: ToolBook }) {
@@ -316,7 +337,7 @@ export default function ChatWorkspace() {
                     {!m.error && <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700"><Check size={11} /> yanıt</span>}
                   </p>
                   <div className="mt-2 rounded-2xl border border-slate-200 bg-white p-5 leading-relaxed text-slate-700">
-                    {m.text}
+                    <AgentText text={m.text} />
                     {m.items?.map((it, k) => <ToolItem key={k} item={it} />)}
                   </div>
                 </div>
