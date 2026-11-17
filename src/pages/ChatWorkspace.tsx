@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useLocation, useSearchParams } from 'react-router'
+import { Link, useLocation, useSearchParams } from 'react-router'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen } from 'lucide-react'
 import { Crumb } from '../components/ui'
 import { sendMessage, getConversation, ChatApiError, type ReplyItem, type HistoryTurn } from '../api/chat'
@@ -50,14 +50,23 @@ function booksFromItem(item: ReplyItem): ToolBook[] {
   return Array.isArray(arr) ? arr.map(normalizeBook) : []
 }
 
+// ISBN'i kapak URL'inin son segmentinden çöz (.../r2.dev/<isbn>) — search_books Id(GUID) döner, isbn yok.
+function isbnFromCover(coverUrl?: string | null): string | undefined {
+  if (!coverUrl) return undefined
+  const seg = coverUrl.split('?')[0].split('/').pop()
+  return seg && /^\d{10,13}$/.test(seg) ? seg : undefined
+}
+
 function BookCard({ book }: { book: ToolBook }) {
+  const isbn = isbnFromCover(book.coverUrl)
+  const title = book.title ?? 'Kitap'
   return (
-    <div className="flex gap-3 rounded-xl border border-slate-200 bg-white p-3">
-      {book.coverUrl
-        ? <img src={book.coverUrl} alt="" className="h-20 w-14 shrink-0 rounded object-cover" />
-        : <span className="flex h-20 w-14 shrink-0 items-center justify-center rounded bg-slate-100 text-slate-400"><BookOpen size={16} /></span>}
+    <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-primary"><BookOpen size={16} /></span>
       <div className="min-w-0">
-        <p className="font-semibold text-slate-800">{book.title ?? 'Kitap'}</p>
+        {isbn
+          ? <Link to={`/kitap/${isbn}`} className="font-semibold text-slate-800 hover:text-primary hover:underline">{title}</Link>
+          : <span className="font-semibold text-slate-800">{title}</span>}
         {book.authors && <p className="text-xs text-slate-500">{book.authors}</p>}
         <p className="mt-1 text-sm">
           {typeof book.price === 'number' && book.price > 0
