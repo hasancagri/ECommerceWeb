@@ -167,10 +167,24 @@ function ToolItem({ item }: { item: ReplyItem }) {
     case 'get_book': {
       const books = booksFromItem(item)
       if (books.length === 0) return null
+      // Sayfalama altlığı (deterministik — tool verisinden, LLM saymaz). Yalnız search_books'ta.
+      const r = (item.result ?? {}) as Record<string, unknown>
+      const total = pick<number>(r, 'total', 'Total')
+      const page = pick<number>(r, 'page', 'Page') ?? 1
+      const pageSize = 20
+      const from = (page - 1) * pageSize + 1
+      const to = (page - 1) * pageSize + books.length
       return (
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          {books.map((b, i) => <BookCard key={b.id ?? i} book={b} />)}
-        </div>
+        <>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {books.map((b, i) => <BookCard key={b.id ?? i} book={b} />)}
+          </div>
+          {item.tool === 'search_books' && typeof total === 'number' && total > books.length && (
+            <p className="mt-2 text-xs text-slate-400">
+              {total} sonuç · {from}–{to} gösteriliyor — devamı için “devamını getir” yaz.
+            </p>
+          )}
+        </>
       )
     }
     case 'get_basket': return <BasketCard item={item} />
