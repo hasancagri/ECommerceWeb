@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen, Plus } from 'lucide-react'
 import { sendMessage, getConversation, listConversations, ChatApiError, type ReplyItem, type HistoryTurn } from '../api/chat'
+import { slugify } from '../api/catalog'
 import { useAuthSession } from '../auth/useAuthSession'
 import { listAnon, getAnon, saveAnon } from '../lib/anonChats'
 
@@ -22,6 +23,7 @@ interface ToolBook {
   title?: string
   authors?: string
   publisher?: string
+  isbn?: string
   price?: number | null
   isSalable?: boolean
   coverUrl?: string | null
@@ -39,6 +41,7 @@ function normalizeBook(raw: unknown): ToolBook {
     title: pick<string>(o, 'title', 'Title'),
     authors: pick<string>(o, 'authors', 'Authors'),
     publisher: pick<string>(o, 'publisher', 'Publisher'),
+    isbn: pick<string>(o, 'isbn', 'Isbn'),
     price: pick<number>(o, 'price', 'Price') ?? null,
     isSalable: pick<boolean>(o, 'isSalable', 'IsSalable'),
     coverUrl: pick<string>(o, 'coverUrl', 'CoverUrl') ?? null,
@@ -85,16 +88,17 @@ function AgentText({ text }: { text: string }) {
 }
 
 function BookCard({ book }: { book: ToolBook }) {
-  const isbn = isbnFromCover(book.coverUrl)
+  const isbn = book.isbn ?? isbnFromCover(book.coverUrl)
   const title = book.title ?? 'Kitap'
+  const href = isbn ? `/kitap/${slugify(title)}-${isbn}` : undefined
   return (
     <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3">
       {book.coverUrl
         ? <img src={book.coverUrl} alt="" loading="lazy" className="h-20 w-14 shrink-0 rounded object-cover" />
         : <span className="flex h-20 w-14 shrink-0 items-center justify-center rounded bg-blue-50 text-primary"><BookOpen size={18} /></span>}
       <div className="min-w-0">
-        {isbn
-          ? <Link to={`/kitap/${isbn}`} className="font-semibold text-slate-800 hover:text-primary hover:underline">{title}</Link>
+        {href
+          ? <Link to={href} className="font-semibold text-slate-800 hover:text-primary hover:underline">{title}</Link>
           : <span className="font-semibold text-slate-800">{title}</span>}
         {book.authors && <p className="text-xs text-slate-500">{book.authors}</p>}
         {book.publisher && <p className="text-xs text-slate-400">{book.publisher}</p>}

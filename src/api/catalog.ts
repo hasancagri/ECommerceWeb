@@ -51,3 +51,37 @@ export function searchProducts(
 export function similarProducts(isbn: string, limit = 10): Promise<ProductSummary[]> {
   return getJson<ProductSummary[]>(`/api/catalog/products/${encodeURIComponent(isbn)}/similar?limit=${limit}`)
 }
+
+// 015: tek kitap detayı (GetBook.Response — camelCase). Detay sayfası ISBN'le çeker.
+export interface BookDetailDto {
+  id: string
+  title: string
+  authors: string
+  publisher: string | null
+  category: string | null
+  price: number | null
+  isSalable: boolean
+  pageCount: number | null
+  language: string | null
+  coverUrl: string | null
+  description: string
+}
+
+// 404 → null (kitap yok). Diğer hata → fırlatır.
+export async function getProductByIsbn(isbn: string): Promise<BookDetailDto | null> {
+  const r = await fetch(`${BASE}/api/catalog/products/${encodeURIComponent(isbn)}`)
+  if (r.status === 404) return null
+  if (!r.ok) throw new CatalogApiError(r.status, `İstek başarısız (${r.status})`)
+  return (await r.json()) as BookDetailDto
+}
+
+// SEO slug: Türkçe fold + kebab. URL /kitap/{slug}-{isbn}; detay sondaki ISBN'den çözülür (slug kozmetik).
+export function slugify(title: string): string {
+  const map: Record<string, string> = { ı: 'i', İ: 'i', ş: 's', Ş: 's', ğ: 'g', Ğ: 'g', ç: 'c', Ç: 'c', ö: 'o', Ö: 'o', ü: 'u', Ü: 'u' }
+  return title
+    .replace(/[ıİşŞğĞçÇöÖüÜ]/g, (ch) => map[ch] ?? ch)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || 'kitap'
+}

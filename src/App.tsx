@@ -36,7 +36,7 @@ export default function App() {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<DiscoverWelcome />} />
         <Route path="/sohbet" element={<ChatWorkspace />} />
-        <Route path="/kitap/1984" element={<BookDetail />} />
+        <Route path="/kitap/:slug" element={<BookDetail />} />
         <Route path="/sepet" element={<Cart />} />
         {/* Üyelere özel alanlar — girişsiz erişim login akışına yönlenir, dönüşte hedefe gelir. */}
         <Route element={<RequireAuth />}>
