@@ -4,8 +4,6 @@ import AuthLayout from './layouts/AuthLayout'
 import AdminLayout from './layouts/AdminLayout'
 import DiscoverWelcome from './pages/DiscoverWelcome'
 import ChatWorkspace from './pages/ChatWorkspace'
-import ChatHistory from './pages/ChatHistory'
-import SearchHistory from './pages/SearchHistory'
 import BookDetail from './pages/BookDetail'
 import PriceAlarms from './pages/PriceAlarms'
 import Follows from './pages/Follows'
@@ -37,12 +35,10 @@ export default function App() {
       <Route element={<PublicLayout />}>
         <Route path="/" element={<DiscoverWelcome />} />
         <Route path="/sohbet" element={<ChatWorkspace />} />
-        <Route path="/kitap/1984" element={<BookDetail />} />
+        <Route path="/kitap/:slug" element={<BookDetail />} />
         <Route path="/sepet" element={<Cart />} />
         {/* Üyelere özel alanlar — girişsiz erişim login akışına yönlenir, dönüşte hedefe gelir. */}
         <Route element={<RequireAuth />}>
-          <Route path="/sohbet-gecmisi" element={<ChatHistory />} />
-          <Route path="/arama-gecmisim" element={<SearchHistory />} />
           <Route path="/fiyat-alarmlari" element={<PriceAlarms />} />
           <Route path="/takiplerim" element={<Follows />} />
           <Route path="/odeme" element={<Checkout />} />

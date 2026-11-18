@@ -1,15 +1,14 @@
 import { Link, NavLink, Outlet } from 'react-router'
 import {
-  MessageSquare, History, Book, NotebookPen, Layers, Quote, BarChart3,
-  Sparkles, Bell, Heart, Truck, MapPin, Settings, ShoppingCart, Lock, LogOut, Search,
+  MessageSquare, Book, NotebookPen, Layers, Quote, BarChart3,
+  Sparkles, Bell, Heart, Truck, MapPin, Settings, ShoppingCart, Lock, LogOut,
 } from 'lucide-react'
 import { Logo } from '../components/ui'
+import ConversationSidebar from '../components/ConversationSidebar'
 import { useAuthSession } from '../auth/useAuthSession'
 
 const assistantNav = [
   { to: '/sohbet', label: 'Aktif Sohbet & Tavsiyeler', icon: MessageSquare },
-  { to: '/sohbet-gecmisi', label: 'Sohbet Geçmişi', icon: History, locked: true },
-  { to: '/arama-gecmisim', label: 'Arama Geçmişim', icon: Search, locked: true },
 ]
 
 const personalNav = [
@@ -19,8 +18,8 @@ const personalNav = [
   { to: '/alintilarim', label: 'Alıntılarım', icon: Quote, locked: true },
   { to: '/okuma-profilim', label: 'Okuma Profilim', icon: BarChart3, locked: true },
   { to: '/haftalik-secki', label: 'Haftalık Seçki', icon: Sparkles, locked: true },
-  { to: '/fiyat-alarmlari', label: 'Fiyat Alarmları', icon: Bell, badge: 2, locked: true },
-  { to: '/takiplerim', label: 'Takiplerim', icon: Heart, badge: 4, locked: true },
+  { to: '/fiyat-alarmlari', label: 'Fiyat Alarmları', icon: Bell, locked: true },
+  { to: '/takiplerim', label: 'Takiplerim', icon: Heart, locked: true },
   { to: '/siparislerim', label: 'Siparişlerim', icon: Truck, locked: true },
   { to: '/adreslerim', label: 'Adreslerim', icon: MapPin, locked: true },
   { to: '/hesap', label: 'Hesap & Ayarlar', icon: Settings, locked: true },
@@ -70,7 +69,6 @@ export default function PublicLayout() {
         <div className="flex items-center gap-3">
           <Link to="/sepet" className="relative rounded-xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-50">
             <ShoppingCart size={18} />
-            <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[11px] font-bold text-white">3</span>
           </Link>
           <span className="h-6 w-px bg-slate-200" />
           {guest ? (
@@ -95,9 +93,16 @@ export default function PublicLayout() {
 
       <div className="flex">
         <aside className="sticky top-16 flex h-[calc(100vh-4rem)] w-[270px] shrink-0 flex-col border-r border-slate-200 bg-white">
-          <nav className="flex-1 overflow-y-auto px-3 py-5">
+          <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-5">
             <p className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400">DOĞAL DİL ASİSTANI</p>
             {assistantNav.map((it) => <NavItem key={it.to} {...it} guest={guest} />)}
+
+            {/* Kalıcı sohbet listesi — her rotada görünür (T011). */}
+            <div className="mt-3 border-t border-slate-100 pt-3">
+              <p className="px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400">SOHBETLER</p>
+              <ConversationSidebar />
+            </div>
+
             <p className="px-3 pb-2 pt-6 text-[11px] font-semibold tracking-wider text-slate-400">
               {guest ? 'KİŞİSEL ALAN · ÜYELERE ÖZEL' : 'KİŞİSEL ALAN'}
             </p>
