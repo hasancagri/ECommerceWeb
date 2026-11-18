@@ -1,0 +1,61 @@
+name: CI
+
+# master push → build + image (GHCR) + deploy (SSH → kubectl). PR → yalnız build kapısı.
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  # ───────────── KAPI: her PR + master push'ta build (Vite) ─────────────
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: npm ci
+      - run: npm run build
+
+  # ───────────── ÜRETİM: yalnız master merge'inde image bas + ghcr'a it ─────────────
+  image:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ghcr login
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      # VITE_* canlı host'lar build anında gömülür (non-secret). API base boş = same-origin (ingress path-split).
+      - name: docker build + push
+        run: |
+          docker build \
+            --build-arg VITE_API_BASE_URL= \
+            --build-arg VITE_OIDC_AUTHORITY=https://id.91.132.49.70.sslip.io \
+            --build-arg VITE_OIDC_REDIRECT=https://app.91.132.49.70.sslip.io/callback \
+            --build-arg VITE_OIDC_POST_LOGOUT=https://app.91.132.49.70.sslip.io/ \
+            -t ghcr.io/hasancagri/ecommerce/web:latest .
+          docker push ghcr.io/hasancagri/ecommerce/web:latest
+
+  # ───────────── CD: master merge'inde cluster'a deploy (SSH → kubectl) ─────────────
+  deploy:
+    needs: image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: SSH deploy key
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy && chmod 600 ~/.ssh/deploy
+          ssh-keyscan -H 91.132.49.70 >> ~/.ssh/known_hosts 2>/dev/null
+      - name: Manifest kopyala + uygula + rollout
+        run: |
+          ssh -i ~/.ssh/deploy root@91.132.49.70 'rm -rf /tmp/deploy-web'
+          scp -i ~/.ssh/deploy -r deploy/k8s root@91.132.49.70:/tmp/deploy-web
+          ssh -i ~/.ssh/deploy root@91.132.49.70 '
+            set -e
+            kubectl apply -f /tmp/deploy-web/
+            kubectl -n ecommerce rollout restart deploy/web
+            kubectl -n ecommerce rollout status deploy/web --timeout=180s
+          '
