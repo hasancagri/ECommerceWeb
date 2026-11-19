@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Box, Sparkles, Copy, Book, Tag, Clock, TrendingUp, ArrowRight, Paperclip, ArrowUp, ChevronDown } from 'lucide-react'
+import { Box, Sparkles, Copy, Book, Tag, Clock, TrendingUp, ArrowRight, Paperclip, ArrowUp } from 'lucide-react'
 import { Crumb } from '../components/ui'
 import data from '../mocks/discover.json'
 import { discoverCards } from '../config/discoverCards'
@@ -73,10 +73,7 @@ export default function DiscoverWelcome() {
           onSubmit={(e) => { e.preventDefault(); if (input.trim()) toChat(navigate, input.trim()) }}
           className="sticky bottom-6 mt-10 w-full max-w-3xl pb-6"
         >
-          <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white py-2 pl-3 pr-2 shadow-lg shadow-slate-200/50">
-            <button type="button" className="flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" /> Dengeli <ChevronDown size={13} />
-            </button>
+          <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white py-2 pl-4 pr-2 shadow-lg shadow-slate-200/50">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
