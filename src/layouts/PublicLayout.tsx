@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { Logo } from '../components/ui'
 import ConversationSidebar from '../components/ConversationSidebar'
+import VoiceAsk from '../components/VoiceAsk'
 import { useAuthSession } from '../auth/useAuthSession'
 
 const assistantNav = [
@@ -132,6 +133,8 @@ export default function PublicLayout() {
           <Logo />
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* 020-voice: sesle soru — her müşteri sayfasından (giriş/admin layout'ta mount edilmez). */}
+          <VoiceAsk />
           <Link to="/sepet" className="relative rounded-xl border border-slate-200 p-2.5 text-slate-600 hover:bg-slate-50">
             <ShoppingCart size={18} />
           </Link>
