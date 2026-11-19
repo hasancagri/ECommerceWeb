@@ -351,10 +351,22 @@ export default function ChatWorkspace() {
     conversationId.current = undefined
     setMessages([])
     setInput('')
-    const initial = (location.state as { message?: string } | null)?.message
-    if (initial) void send(initial)
+    const st = location.state as { message?: string; draft?: string } | null
+    if (st?.message) void send(st.message)
+    // 020-voice: sesle gelen metin composer'a düşer — OTOMATİK GÖNDERME YOK (FR-004).
+    else if (st?.draft) setInput(st.draft)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId, openConvo])
+
+  // 020-voice: /sohbet'teyken sesle soru → mevcut sohbeti koruyarak composer'a yaz (navigate değil, event).
+  useEffect(() => {
+    const onDraft = (e: Event) => {
+      const text = (e as CustomEvent<{ text: string }>).detail?.text
+      if (text) setInput(text)
+    }
+    window.addEventListener('scout:voice-draft', onDraft)
+    return () => window.removeEventListener('scout:voice-draft', onDraft)
+  }, [])
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
