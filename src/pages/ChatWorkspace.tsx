@@ -359,7 +359,7 @@ export default function ChatWorkspace() {
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
       {/* Aktif sohbet — kalıcı sohbet listesi artık PublicLayout sol sidebar'ında. */}
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-8 py-6">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-6 sm:px-8">
         <span className="flex w-fit items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-sm font-medium text-blue-700">
           <Sparkles size={14} /> Kâşif — kitap, sepet, sipariş… ne sorarsan
         </span>
