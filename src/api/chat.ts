@@ -7,6 +7,15 @@ export interface ReplyItem {
   tool: string
   // Tool dönüşünden BİREBİR ham sonuç (search_books → {items,total,page}, get_book → kitap, vb.).
   result: unknown
+  // search_books'ta dolu: kullanılan arama filtreleri (publisher/sort/query/page…). "devamını getir"de
+  // page+1 ile geri taşınır (sayfalama). Diğer tool'larda yok.
+  filters?: Record<string, unknown>
+}
+
+// Sohbette taşınan son-arama durumu — "devamını getir" bunu page+1 ile backend'e yollar.
+export interface LastSearch {
+  filters: Record<string, unknown>
+  page: number
 }
 
 // 014: anon istemci-transkript turu (devamlılık/sayfalama bağlamı). Login'de sunucu kaydı otoriter.
@@ -61,7 +70,7 @@ async function request<T>(path: string, init: RequestInit, token?: string): Prom
 }
 
 export function sendMessage(
-  body: { conversationId?: string; message: string; history?: HistoryTurn[] },
+  body: { conversationId?: string; message: string; history?: HistoryTurn[]; lastSearch?: LastSearch },
   token?: string,
 ): Promise<SendMessageResult> {
   return request<SendMessageResult>(

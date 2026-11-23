@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen } from 'lucide-react'
-import { sendMessage, getConversation, ChatApiError, type ReplyItem, type HistoryTurn } from '../api/chat'
+import { sendMessage, getConversation, ChatApiError, type ReplyItem, type HistoryTurn, type LastSearch } from '../api/chat'
 import { slugify } from '../api/catalog'
 import { useAuthSession } from '../auth/useAuthSession'
 import { getAnon, saveAnon } from '../lib/anonChats'
@@ -44,6 +44,15 @@ interface ToolBook {
 function pick<T>(o: Record<string, unknown>, ...keys: string[]): T | undefined {
   for (const k of keys) if (o[k] != null) return o[k] as T
   return undefined
+}
+
+// Cevaptaki son search_books item'ından sayfalama durumu ("devamını getir" için). filters backend'in
+// echo'ladığı kullanılan args; page sonucun o anki sayfası. Yoksa undefined (arama yapılmadı).
+function lastSearchFromItems(items?: ReplyItem[]): LastSearch | undefined {
+  const item = items?.filter((i) => i.tool === 'search_books' && i.filters).at(-1)
+  if (!item?.filters) return undefined
+  const r = (item.result ?? {}) as Record<string, unknown>
+  return { filters: item.filters, page: pick<number>(r, 'page', 'Page') ?? 1 }
 }
 
 function normalizeBook(raw: unknown): ToolBook {
@@ -278,6 +287,8 @@ export default function ChatWorkspace() {
   const conversationId = useRef<string | undefined>(undefined)
   const messagesRef = useRef<Msg[]>([])
   messagesRef.current = messages
+  // "devamını getir" için son aramanın filtre+page'i (her arama cevabında tazelenir, taşınır).
+  const lastSearchRef = useRef<LastSearch | undefined>(undefined)
 
   // Aktif sohbet id'si URL'den: ?c=<id>. Kalıcı sidebar (PublicLayout) linklerle bunu değiştirir.
   const activeId = params.get('c') ?? undefined
@@ -287,7 +298,7 @@ export default function ChatWorkspace() {
     if (isAuthenticated && accessToken) {
       try {
         const c = await getConversation(id, accessToken)
-        setMessages(c.messages.map((m) => {
+        const mapped = c.messages.map((m) => {
           // Backend rol'ü PascalCase döner ("User"/"Assistant"); casing-defansif karşılaştır.
           const isAssistant = (m.role ?? '').toLowerCase() === 'assistant'
           return {
@@ -296,11 +307,15 @@ export default function ChatWorkspace() {
             // T009: kaydedilmiş assistant kartları (itemsJson) canlı reply ile aynı render'dan geçer.
             items: isAssistant ? parseItems(m.itemsJson) : undefined,
           } as Msg
-        }))
-      } catch { setMessages([]) }
+        })
+        setMessages(mapped)
+        lastSearchRef.current = lastSearchFromItems(mapped.flatMap((m) => m.items ?? []))
+      } catch { setMessages([]); lastSearchRef.current = undefined }
     } else {
       const c = getAnon(id)
-      setMessages(c?.messages.map((m) => ({ role: m.role, text: m.text, items: m.items, error: m.error })) ?? [])
+      const mapped = c?.messages.map((m) => ({ role: m.role, text: m.text, items: m.items, error: m.error })) ?? []
+      setMessages(mapped)
+      lastSearchRef.current = lastSearchFromItems(mapped.flatMap((m) => m.items ?? []))
     }
   }, [isAuthenticated, accessToken])
 
@@ -316,10 +331,13 @@ export default function ChatWorkspace() {
       // Tam transkript (başından sonuna) history'de; login'de sunucu otoriter, anon'da bağlam buradan.
       const history: HistoryTurn[] = prior.map((m) => ({ role: m.role, text: m.text }))
       const res = await sendMessage(
-        { conversationId: conversationId.current, message: trimmed, history },
+        { conversationId: conversationId.current, message: trimmed, history,
+          lastSearch: lastSearchRef.current },
         isAuthenticated ? accessToken : undefined,
       )
       conversationId.current = res.conversationId
+      // "devamını getir" cevabı da search_books döndüğü için page otomatik ilerler; yoksa korunur.
+      lastSearchRef.current = lastSearchFromItems(res.reply.items) ?? lastSearchRef.current
       const asstMsg: Msg = { role: 'assistant', text: res.reply.text, items: res.reply.items }
       const full = [...prior, userMsg, asstMsg]
       setMessages(full)
@@ -349,6 +367,7 @@ export default function ChatWorkspace() {
     }
     // Yeni sohbet (no ?c=): durumu temizle.
     conversationId.current = undefined
+    lastSearchRef.current = undefined
     setMessages([])
     setInput('')
     const st = location.state as { message?: string; draft?: string } | null
