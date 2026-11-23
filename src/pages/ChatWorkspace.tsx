@@ -251,7 +251,8 @@ function ToolItem({ item }: { item: ReplyItem }) {
       const r = (item.result ?? {}) as Record<string, unknown>
       const total = pick<number>(r, 'total', 'Total')
       const page = pick<number>(r, 'page', 'Page') ?? 1
-      const pageSize = 20
+      // pageSize backend'in echo'ladığı filtreden (gerçek değer; backend varsayılanı 10). Yoksa 10.
+      const pageSize = typeof item.filters?.pageSize === 'number' ? item.filters.pageSize : 10
       const from = (page - 1) * pageSize + 1
       const to = (page - 1) * pageSize + books.length
       return (
