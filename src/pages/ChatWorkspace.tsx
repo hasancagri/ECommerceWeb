@@ -30,10 +30,22 @@ interface Msg {
   understood?: BookSearchFilters   // 022: sistemin sorgudan çıkardığı filtreler ("anladım" chip)
 }
 
-// 022: "devamını getir" niyeti (basit) — doğruysa /extract atlanır, son typed filtre page+1 ile aranır.
+// 022: "devamını getir" niyeti — doğruysa /extract atlanır, son typed filtre page+1 ile aranır.
+// Anchored: Türkçe-fold + nezaket/fiil-kökü filler SÖK → kalan TAM bir core ifadeye eşit mi (backend
+// PaginationIntent deseni). Fiil-kökü prefix "getirebilir misin" gibi ek-çekimli varyantları yakalar;
+// anchored olduğundan "daha fazla Dostoyevski" gibi gerçek sorgular pagination sanılmaz.
 function isMore(text: string): boolean {
-  const t = text.trim().toLowerCase()
-  return /^(devam(ını)?( getir)?|sonraki( sayfa)?|daha( fazla)?( göster)?|başka( var)?)\??$/.test(t)
+  const fold = (s: string) => s.toLowerCase()
+    .replace(/[iİıI]/g, 'i').replace(/[çÇ]/g, 'c').replace(/[şŞ]/g, 's')
+    .replace(/[ğĞ]/g, 'g').replace(/[üÜ]/g, 'u').replace(/[öÖ]/g, 'o')
+    .replace(/[^a-z ]/g, ' ')
+  const core = new Set(['devam', 'devami', 'devamini', 'sonraki', 'sonrakiler', 'daha fazla', 'digerleri', 'baska'])
+  const fillerExact = new Set(['misin', 'misiniz', 'mi', 'lutfen', 'rica', 'ederim', 'bana', 'sayfa',
+    'sayfayi', 'sonuc', 'sonuclar', 'sonuclari', 'acaba', 'et', 'edebilir', 'ki'])
+  const fillerPrefix = ['getir', 'goster', 'ver', 'listele', 'bul']   // fiil kökleri (ek-çekim toleranslı)
+  const toks = fold(text).split(/\s+/).filter(Boolean)
+    .filter((t) => !fillerExact.has(t) && !fillerPrefix.some((p) => t.startsWith(p)))
+  return toks.length > 0 && core.has(toks.join(' '))
 }
 
 // 022: çıkarılan tipli niyeti kullanıcıya gösterilecek kısa etiketlere özetler (chip satırı).
@@ -362,7 +374,7 @@ export default function ChatWorkspace() {
       const paginate = isMore(trimmed) && lastFiltersRef.current
       const understood: BookSearchFilters = paginate
         ? { ...lastFiltersRef.current!, page: (lastFiltersRef.current!.page ?? 1) + 1 }
-        : await extractIntent(trimmed, token)
+        : await extractIntent(trimmed, lastFiltersRef.current, token)  // önceki filtre = bağlam (daralt/sıfırla)
       const res = await searchTyped(
         { conversationId: conversationId.current, message: trimmed, filters: understood },
         token,

@@ -95,11 +95,12 @@ export function sendMessage(
   )
 }
 
-// 022 Tur-1: ham sorgu → tipli niyet (LLM structured output, sunucuda). Durumsuz.
-export function extractIntent(query: string, token?: string): Promise<BookSearchFilters> {
+// 022 Tur-1: ham sorgu → tipli niyet (LLM structured output, sunucuda). previous = önceki turun tipli
+// filtresi (bağlam): doluysa LLM daraltma/sıfırlama kararını verir (çok-turlu refinement).
+export function extractIntent(query: string, previous?: BookSearchFilters, token?: string): Promise<BookSearchFilters> {
   return request<BookSearchFilters>(
     '/api/chat/v1/extract',
-    { method: 'POST', body: JSON.stringify({ query }) },
+    { method: 'POST', body: JSON.stringify({ query, previous: previous ?? null }) },
     token,
   )
 }
