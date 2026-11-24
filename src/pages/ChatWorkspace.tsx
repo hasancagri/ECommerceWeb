@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen } from 'lucide-react'
-import { sendMessage, getConversation, ChatApiError, type ReplyItem, type HistoryTurn, type LastSearch } from '../api/chat'
+import { getConversation, ChatApiError, extractIntent, searchTyped, type ReplyItem, type LastSearch, type BookSearchFilters } from '../api/chat'
 import { slugify } from '../api/catalog'
 import { useAuthSession } from '../auth/useAuthSession'
 import { getAnon, saveAnon } from '../lib/anonChats'
@@ -27,6 +27,31 @@ interface Msg {
   text: string
   items?: ReplyItem[]
   error?: boolean
+  understood?: BookSearchFilters   // 022: sistemin sorgudan çıkardığı filtreler ("anladım" chip)
+}
+
+// 022: "devamını getir" niyeti (basit) — doğruysa /extract atlanır, son typed filtre page+1 ile aranır.
+function isMore(text: string): boolean {
+  const t = text.trim().toLowerCase()
+  return /^(devam(ını)?( getir)?|sonraki( sayfa)?|daha( fazla)?( göster)?|başka( var)?)\??$/.test(t)
+}
+
+// 022: çıkarılan tipli niyeti kullanıcıya gösterilecek kısa etiketlere özetler (chip satırı).
+function summarizeFilters(f?: BookSearchFilters): string[] {
+  if (!f) return []
+  const out: string[] = []
+  if (f.text?.author) out.push(`Yazar: ${f.text.author}`)
+  if (f.text?.query) out.push(`Konu: ${f.text.query}`)
+  if (f.publisher?.include) out.push(`Yayınevi: ${f.publisher.include}`)
+  if (f.publisher?.exclude) out.push(`Hariç: ${f.publisher.exclude}`)
+  if (f.sortHint) out.push(`Sıralama: ${f.sortHint}`)
+  if (f.priceHint) out.push(`Fiyat: ${f.priceHint}`)
+  if (f.bindingHint) out.push(`Cilt: ${f.bindingHint}`)
+  if (f.pageHint) out.push(`Sayfa: ${f.pageHint}`)
+  if (f.flags?.onlyDiscounted) out.push('İndirimli')
+  if (f.flags?.onlyInStock) out.push('Stokta')
+  if (f.flags?.onlySalable) out.push('Satışta')
+  return out
 }
 
 // search_books/get_book tool dönüşündeki kitap — casing defansif (MCP/STJ serileştirmesi camel|Pascal).
@@ -290,6 +315,8 @@ export default function ChatWorkspace() {
   messagesRef.current = messages
   // "devamını getir" için son aramanın filtre+page'i (her arama cevabında tazelenir, taşınır).
   const lastSearchRef = useRef<LastSearch | undefined>(undefined)
+  // 022: son çıkarılan tipli filtre — "devamını getir"de page+1 ile /search'e yollanır (oturum-içi).
+  const lastFiltersRef = useRef<BookSearchFilters | undefined>(undefined)
 
   // Aktif sohbet id'si URL'den: ?c=<id>. Kalıcı sidebar (PublicLayout) linklerle bunu değiştirir.
   const activeId = params.get('c') ?? undefined
@@ -329,17 +356,21 @@ export default function ChatWorkspace() {
     setMessages([...prior, userMsg])
     setLoading(true)
     try {
-      // Tam transkript (başından sonuna) history'de; login'de sunucu otoriter, anon'da bağlam buradan.
-      const history: HistoryTurn[] = prior.map((m) => ({ role: m.role, text: m.text }))
-      const res = await sendMessage(
-        { conversationId: conversationId.current, message: trimmed, history,
-          lastSearch: lastSearchRef.current },
-        isAuthenticated ? accessToken : undefined,
+      const token = isAuthenticated ? accessToken : undefined
+      // 022 iki-faz: "devamını getir" → /extract ATLA, son tipli filtreyi page+1 ile ara. Aksi halde
+      // Tur-1 /extract (LLM niyet-oku → tipli slot) → Tur-2 /search (deterministik, LLM yok).
+      const paginate = isMore(trimmed) && lastFiltersRef.current
+      const understood: BookSearchFilters = paginate
+        ? { ...lastFiltersRef.current!, page: (lastFiltersRef.current!.page ?? 1) + 1 }
+        : await extractIntent(trimmed, token)
+      const res = await searchTyped(
+        { conversationId: conversationId.current, message: trimmed, filters: understood },
+        token,
       )
       conversationId.current = res.conversationId
-      // "devamını getir" cevabı da search_books döndüğü için page otomatik ilerler; yoksa korunur.
+      lastFiltersRef.current = understood
       lastSearchRef.current = lastSearchFromItems(res.reply.items) ?? lastSearchRef.current
-      const asstMsg: Msg = { role: 'assistant', text: res.reply.text, items: res.reply.items }
+      const asstMsg: Msg = { role: 'assistant', text: res.reply.text, items: res.reply.items, understood }
       const full = [...prior, userMsg, asstMsg]
       setMessages(full)
       // Anon → sessionStorage'a yaz (login'de sunucu zaten kaydetti).
@@ -369,6 +400,7 @@ export default function ChatWorkspace() {
     // Yeni sohbet (no ?c=): durumu temizle.
     conversationId.current = undefined
     lastSearchRef.current = undefined
+    lastFiltersRef.current = undefined
     setMessages([])
     setInput('')
     const st = location.state as { message?: string; draft?: string } | null
@@ -421,6 +453,14 @@ export default function ChatWorkspace() {
                     {!m.error && <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700"><Check size={11} /> yanıt</span>}
                   </p>
                   <div className="mt-2 rounded-2xl border border-slate-200 bg-white p-5 leading-relaxed text-slate-700">
+                    {/* 022: "anladım" — sistemin sorgudan çıkardığı filtreler (gösterim; onay değil). */}
+                    {summarizeFilters(m.understood).length > 0 && (
+                      <div className="mb-3 flex flex-wrap gap-1.5">
+                        {summarizeFilters(m.understood).map((chip, c) => (
+                          <span key={c} className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600">{chip}</span>
+                        ))}
+                      </div>
+                    )}
                     <AgentText text={m.text} />
                     {m.items?.map((it, k) => <ToolItem key={k} item={it} />)}
                   </div>

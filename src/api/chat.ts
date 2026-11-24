@@ -18,6 +18,21 @@ export interface LastSearch {
   page: number
 }
 
+// 022: iki-faz tipli niyet (React↔backend kontratı, NESTED). /extract üretir, /search tüketir.
+// Her grup opsiyonel (null = o konu konuşulmadı). "anladım" chip'i bunu özetler.
+export interface BookSearchFilters {
+  text?: { query?: string | null; author?: string | null } | null
+  publisher?: { include?: string | null; exclude?: string | null } | null
+  priceHint?: string | null
+  sortHint?: string | null
+  bindingHint?: string | null
+  pageHint?: string | null
+  taxonomy?: { genres?: string[] | null; moods?: string[] | null; themes?: string[] | null; audience?: string[] | null } | null
+  flags?: { onlyDiscounted?: boolean; onlyInStock?: boolean; onlySalable?: boolean } | null
+  page: number
+  pageSize: number
+}
+
 // 014: anon istemci-transkript turu (devamlılık/sayfalama bağlamı). Login'de sunucu kaydı otoriter.
 export interface HistoryTurn {
   role: 'user' | 'assistant'
@@ -75,6 +90,28 @@ export function sendMessage(
 ): Promise<SendMessageResult> {
   return request<SendMessageResult>(
     '/api/chat/v1/messages',
+    { method: 'POST', body: JSON.stringify(body) },
+    token,
+  )
+}
+
+// 022 Tur-1: ham sorgu → tipli niyet (LLM structured output, sunucuda). Durumsuz.
+export function extractIntent(query: string, token?: string): Promise<BookSearchFilters> {
+  return request<BookSearchFilters>(
+    '/api/chat/v1/extract',
+    { method: 'POST', body: JSON.stringify({ query }) },
+    token,
+  )
+}
+
+// 022 Tur-2: tipli niyet → kartlar (deterministik, LLM yok). message = kullanıcının ham sorgusu
+// (Conversation'a insan-metni; login kaydı korunur). Cevap şekli sendMessage ile AYNI.
+export function searchTyped(
+  body: { conversationId?: string; message: string; filters: BookSearchFilters },
+  token?: string,
+): Promise<SendMessageResult> {
+  return request<SendMessageResult>(
+    '/api/chat/v1/search',
     { method: 'POST', body: JSON.stringify(body) },
     token,
   )
