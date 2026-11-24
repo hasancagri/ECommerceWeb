@@ -4,7 +4,7 @@
 // + sil (login sunucu çağrısı, anon sessionStorage). Aktif sohbet silinince /sohbet'e döner (yeni sohbet).
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
-import { MessageSquare, Plus, MoreHorizontal, Pencil, Trash2, Check, X } from 'lucide-react'
+import { MessageSquare, Plus, MoreHorizontal, Pencil, Trash2, Check, X, ChevronDown, ChevronRight } from 'lucide-react'
 import { listConversations, renameConversation, deleteConversation } from '../api/chat'
 import { listAnon, renameAnon, deleteAnon } from '../lib/anonChats'
 import { useAuthSession } from '../auth/useAuthSession'
@@ -26,6 +26,13 @@ export default function ConversationSidebar() {
   const [editTitle, setEditTitle] = useState('')
   const [busy, setBusy] = useState(false)
   const editRef = useRef<HTMLInputElement>(null)
+  // Sabit "Geçmiş sohbetler" folder'ı — tüm yazışmalar içinde; collapse durumu localStorage'da kalıcı.
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem('scout:history-collapsed') === '1')
+  const toggleCollapsed = () => setCollapsed((c) => {
+    const next = !c
+    localStorage.setItem('scout:history-collapsed', next ? '1' : '0')
+    return next
+  })
 
   const refresh = useCallback(async () => {
     if (isAuthenticated && accessToken) {
@@ -100,6 +107,17 @@ export default function ConversationSidebar() {
         <Plus size={15} /> Yeni sohbet
       </Link>
 
+      {/* Sabit folder başlığı — tık ile tüm geçmiş aç/kapa (collapse). */}
+      <button onClick={toggleCollapsed}
+        className="mb-1 flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400 hover:bg-slate-50">
+        {collapsed ? <ChevronRight size={13} /> : <ChevronDown size={13} />}
+        Geçmiş sohbetler
+        {rows.length > 0 && (
+          <span className="ml-auto rounded-full bg-slate-100 px-1.5 text-[10px] font-medium text-slate-500">{rows.length}</span>
+        )}
+      </button>
+
+      {!collapsed && (
       <div className="max-h-72 space-y-0.5 overflow-y-auto">
         {rows.length === 0 ? (
           <p className="px-3 py-2 text-xs text-slate-400">
@@ -156,6 +174,7 @@ export default function ConversationSidebar() {
           })
         )}
       </div>
+      )}
 
       {/* Fixed menü — overflow clip'ten bağımsız (sidebar/nav iç içe scroll kutularını aşar). */}
       {menuId && menuPos && (() => {

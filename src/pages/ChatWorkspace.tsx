@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen } from 'lucide-react'
 import { getConversation, ChatApiError, extractIntent, searchTyped, type ReplyItem, type LastSearch, type BookSearchFilters } from '../api/chat'
 import { slugify } from '../api/catalog'
+import { exampleChips } from '../config/discoverCards'
 import { useAuthSession } from '../auth/useAuthSession'
 import { getAnon, saveAnon } from '../lib/anonChats'
 
@@ -451,7 +452,22 @@ export default function ChatWorkspace() {
 
         <div className="mt-8 flex-1 space-y-6">
           {messages.length === 0 && !loading && (
-            <p className="text-slate-400">Bir şey sor — örn. “Sabahattin Ali'nin kitaplarını listeler misin”.</p>
+            <div className="space-y-3">
+              {/* 026: betimlemeye özendir — ne kadar anlatırsan semantik o kadar isabetli. Çip tık → send(). */}
+              <p className="text-slate-400">Ne okumak istediğini anlat — ruh hali, konu, tarz… ya da yazar/başlık ara.</p>
+              <div className="flex flex-wrap gap-2">
+                {exampleChips.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => void send(c)}
+                    className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:border-primary hover:text-primary"
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
           {messages.map((m, i) =>
@@ -506,7 +522,7 @@ export default function ChatWorkspace() {
               disabled={loading}
               maxLength={2000}
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400 disabled:opacity-60"
-              placeholder="İstediğini sorabilirsin — kitap, yazar, konu, sepetin…"
+              placeholder="Ne istediğini anlat: ruh hali, konu, tarz… ya da yazar/başlık ara."
             />
             <button type="button" className="p-2 text-slate-400"><Paperclip size={17} /></button>
             <button type="submit" disabled={loading} className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white disabled:opacity-50"><ArrowUp size={18} /></button>
