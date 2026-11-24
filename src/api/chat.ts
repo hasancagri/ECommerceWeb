@@ -7,6 +7,30 @@ export interface ReplyItem {
   tool: string
   // Tool dönüşünden BİREBİR ham sonuç (search_books → {items,total,page}, get_book → kitap, vb.).
   result: unknown
+  // search_books'ta dolu: kullanılan arama filtreleri (publisher/sort/query/page…). "devamını getir"de
+  // page+1 ile geri taşınır (sayfalama). Diğer tool'larda yok.
+  filters?: Record<string, unknown>
+}
+
+// Sohbette taşınan son-arama durumu — "devamını getir" bunu page+1 ile backend'e yollar.
+export interface LastSearch {
+  filters: Record<string, unknown>
+  page: number
+}
+
+// 022: iki-faz tipli niyet (React↔backend kontratı, NESTED). /extract üretir, /search tüketir.
+// Her grup opsiyonel (null = o konu konuşulmadı). "anladım" chip'i bunu özetler.
+export interface BookSearchFilters {
+  text?: { query?: string | null; author?: string | null } | null
+  publisher?: { include?: string | null; exclude?: string | null } | null
+  priceHint?: string | null
+  sortHint?: string | null
+  bindingHint?: string | null
+  pageHint?: string | null
+  taxonomy?: { genres?: string[] | null; moods?: string[] | null; themes?: string[] | null; audience?: string[] | null } | null
+  flags?: { onlyDiscounted?: boolean; onlyInStock?: boolean; onlySalable?: boolean } | null
+  page: number
+  pageSize: number
 }
 
 // 014: anon istemci-transkript turu (devamlılık/sayfalama bağlamı). Login'de sunucu kaydı otoriter.
@@ -61,11 +85,34 @@ async function request<T>(path: string, init: RequestInit, token?: string): Prom
 }
 
 export function sendMessage(
-  body: { conversationId?: string; message: string; history?: HistoryTurn[] },
+  body: { conversationId?: string; message: string; history?: HistoryTurn[]; lastSearch?: LastSearch },
   token?: string,
 ): Promise<SendMessageResult> {
   return request<SendMessageResult>(
     '/api/chat/v1/messages',
+    { method: 'POST', body: JSON.stringify(body) },
+    token,
+  )
+}
+
+// 022 Tur-1: ham sorgu → tipli niyet (LLM structured output, sunucuda). previous = önceki turun tipli
+// filtresi (bağlam): doluysa LLM daraltma/sıfırlama kararını verir (çok-turlu refinement).
+export function extractIntent(query: string, previous?: BookSearchFilters, token?: string): Promise<BookSearchFilters> {
+  return request<BookSearchFilters>(
+    '/api/chat/v1/extract',
+    { method: 'POST', body: JSON.stringify({ query, previous: previous ?? null }) },
+    token,
+  )
+}
+
+// 022 Tur-2: tipli niyet → kartlar (deterministik, LLM yok). message = kullanıcının ham sorgusu
+// (Conversation'a insan-metni; login kaydı korunur). Cevap şekli sendMessage ile AYNI.
+export function searchTyped(
+  body: { conversationId?: string; message: string; filters: BookSearchFilters },
+  token?: string,
+): Promise<SendMessageResult> {
+  return request<SendMessageResult>(
+    '/api/chat/v1/search',
     { method: 'POST', body: JSON.stringify(body) },
     token,
   )
