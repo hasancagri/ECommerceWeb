@@ -329,6 +329,8 @@ export default function ChatWorkspace() {
   const lastSearchRef = useRef<LastSearch | undefined>(undefined)
   // 022: son çıkarılan tipli filtre — "devamını getir"de page+1 ile /search'e yollanır (oturum-içi).
   const lastFiltersRef = useRef<BookSearchFilters | undefined>(undefined)
+  // router-state ilk mesajını tam 1 kez otomatik gönder (StrictMode çift-effect + re-run guard).
+  const initialSentRef = useRef<string | null>(null)
 
   // Aktif sohbet id'si URL'den: ?c=<id>. Kalıcı sidebar (PublicLayout) linklerle bunu değiştirir.
   const activeId = params.get('c') ?? undefined
@@ -416,7 +418,12 @@ export default function ChatWorkspace() {
     setMessages([])
     setInput('')
     const st = location.state as { message?: string; draft?: string } | null
-    if (st?.message) void send(st.message)
+    // Tek-seferlik: StrictMode (dev) effect'i 2 kez çağırır + effect re-run'ında state.message durur →
+    // çift otomatik-gönderim. Mesaja anahtarlı ref ile tam 1 kez gönder (distinct yeni mesaj yine gider).
+    if (st?.message && initialSentRef.current !== st.message) {
+      initialSentRef.current = st.message
+      void send(st.message)
+    }
     // 020-voice: sesle gelen metin composer'a düşer — OTOMATİK GÖNDERME YOK (FR-004).
     else if (st?.draft) setInput(st.draft)
     // eslint-disable-next-line react-hooks/exhaustive-deps
