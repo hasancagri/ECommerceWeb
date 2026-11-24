@@ -149,10 +149,13 @@ function BookCard({ book }: { book: ToolBook }) {
   const isbn = book.isbn ?? isbnFromCover(book.coverUrl)
   const title = book.title ?? 'Kitap'
   const href = isbn ? `/kitap/${slugify(title)}-${isbn}` : undefined
+  // Kapağı kendi File serve ucundan çöz (/files/v1/covers/{isbn}) — API'nin döndüğü coverUrl R2 public
+  // dev host'unu (pub-...r2.dev) gösteriyor, prod'da ÖLÜ. /files gateway'den çalışır (dev+prod proxy'li).
+  const coverSrc = isbn ? `/files/v1/covers/${isbn}` : book.coverUrl
   return (
     <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3">
-      {book.coverUrl
-        ? <img src={book.coverUrl} alt="" loading="lazy" className="h-20 w-14 shrink-0 rounded object-cover" />
+      {coverSrc
+        ? <img src={coverSrc} alt="" loading="lazy" className="h-20 w-14 shrink-0 rounded object-cover" />
         : <span className="flex h-20 w-14 shrink-0 items-center justify-center rounded bg-blue-50 text-primary"><BookOpen size={18} /></span>}
       <div className="min-w-0">
         {href
