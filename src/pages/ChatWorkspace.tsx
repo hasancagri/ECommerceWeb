@@ -281,6 +281,7 @@ function SearchHistoryCard({ item }: { item: ReplyItem }) {
 function ToolItem({ item }: { item: ReplyItem }) {
   switch (item.tool) {
     case 'search_books':
+    case 'similar_books':
     case 'get_book': {
       const books = booksFromItem(item)
       if (books.length === 0) return null
