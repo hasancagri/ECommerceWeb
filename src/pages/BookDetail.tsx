@@ -1,10 +1,49 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { ArrowLeft, BookOpen, Loader2, AlertCircle, ShoppingCart, Lock } from 'lucide-react'
+import {
+  ArrowLeft, BookOpen, Loader2, AlertCircle, ShoppingCart, Lock,
+  Heart, Bell, MessageCircle, Users, BookMarked, PauseCircle, CheckCircle2, Sparkles, Package,
+} from 'lucide-react'
 import { Crumb, Stars, Pill } from '../components/ui'
 import { useAuthSession } from '../auth/useAuthSession'
 import { getProductByIsbn, type BookDetailDto } from '../api/catalog'
 import { getBookReviews, type BookReviews } from '../api/reviews'
+
+// ── MOCK veri (görsel-önce; blok blok gerçek backend'e bağlanacak) ──────────────
+// Okuma durumu sayıları — ileride okuma-durumu modeli (bitiren/okuyan/yarım bırakan).
+const MOCK_READING = { reading: 1240, finished: 23305, abandoned: 1876 }
+// Fiyat geçmişi son 6 ay — ileride fiyat-değişim kaydı (fiyat-sabit kararı gevşerse).
+const MOCK_PRICE_HISTORY = [
+  { m: 'Haz', v: 165 }, { m: 'Tem', v: 158 }, { m: 'Ağu', v: 172 },
+  { m: 'Eyl', v: 149 }, { m: 'Eki', v: 155 }, { m: 'Kas', v: 141.38 },
+]
+// Okurların ortak görüşü — ileride ML duygu analizi (yorumlardan).
+const MOCK_SENTIMENT = {
+  summary: 'Okurlar en çok düşünsel derinliği ve çeviriyi övüyor; az sayıda okur baskı ve kağıt kalitesinden yakınıyor. Baskın his: tedirgin edici ama sürükleyici.',
+  pills: ['Düşündürücü', 'Sürükleyici', 'Tedirgin edici', 'Çarpıcı'],
+  dimensions: [
+    { label: 'Düşünsel derinlik', pct: 96 }, { label: 'Çeviri', pct: 94 },
+    { label: 'Akıcılık / tempo', pct: 88 }, { label: 'Baskı & kağıt', pct: 79 },
+  ],
+  reviewCount: 8388,
+}
+const MOCK_LIKES = 3420
+const REVIEWS_PREVIEW = 3   // önce bu kadar göster, sonra "tümünü göster"
+
+// Okur yorumları (mock — gerçek veri yoksa gösterilir; ileride Reviews BC REST yüzeyi).
+const MOCK_REVIEWS = {
+  average: 4.6,
+  count: 8388,
+  items: [
+    { author: 'Deniz K.', rating: 5, createdAt: '2026-09-14', text: 'Yazıldığı dönemden bugüne hiç eskimemiş bir distopya klasiği. Gözetim ve gerçeğin çarpıtılması üzerine okurken insanı ürperten bir kitap.' },
+    { author: 'Mert A.', rating: 5, createdAt: '2026-08-02', text: 'Çeviri çok akıcı. Ağır olur diye çekiniyordum ama bir solukta bitirdim; herkese tavsiye ederim.' },
+    { author: 'Elif Y.', rating: 4, createdAt: '2026-06-21', text: 'Dil, bellek ve iktidar üzerine düşündüren güçlü bir roman. Sonu beni uzun süre meşgul etti.' },
+    { author: 'Caner B.', rating: 5, createdAt: '2026-05-30', text: 'Üniversitede okumuştum, yıllar sonra tekrar okudum; her yaşta farklı bir yerinden vuruyor.' },
+    { author: 'Zeynep T.', rating: 3, createdAt: '2026-04-11', text: 'Fikirler çarpıcı ama orta bölümler bana biraz yavaş geldi. Yine de değerli bir okuma.' },
+    { author: 'Okan S.', rating: 5, createdAt: '2026-03-08', text: 'Baskı ve kağıt kalitesi gayet iyi. İçerik zaten başyapıt; bu baskıyı gönül rahatlığıyla alabilirsiniz.' },
+    { author: 'Hakan D.', rating: 2, createdAt: '2026-02-19', text: 'Benim için fazla karanlık ve umutsuzdu; edebi değerini yadsımam ama keyifli bir okuma olmadı.' },
+  ],
+}
 
 // 015/018: gerçek kitap detayı. URL /kitap/{slug}-{isbn} — slug kozmetik, ISBN anahtar.
 function isbnFromSlug(slug: string | undefined): string | undefined {
@@ -37,6 +76,9 @@ export default function BookDetail() {
   const [book, setBook] = useState<BookDetailDto | null>(null)
   const [state, setState] = useState<'loading' | 'ok' | 'notfound' | 'error'>('loading')
   const [reviews, setReviews] = useState<BookReviews | null>(null)
+  const [liked, setLiked] = useState(false)          // mock: kitabı beğen
+  const [showAllReviews, setShowAllReviews] = useState(false)
+  const [readingStatus, setReadingStatus] = useState<'will' | 'reading' | 'abandoned' | null>(null)  // mock: tek seçili
 
   useEffect(() => {
     if (!isbn) { setState('notfound'); return }
@@ -68,6 +110,14 @@ export default function BookDetail() {
     ? Math.round(book.price * (1 - book.discountRate) * 100) / 100
     : null
   const discountPct = book?.discountRate ? Math.round(book.discountRate * 100) : null
+
+  // Okuma durumu (mock) — bitirme oranı = bitiren / (bitiren + yarım bırakan).
+  const { reading, finished, abandoned } = MOCK_READING
+  const completionRate = Math.round((finished / (finished + abandoned)) * 100)
+  const priceMax = Math.max(...MOCK_PRICE_HISTORY.map((p) => p.v))
+  const priceMin = Math.min(...MOCK_PRICE_HISTORY.map((p) => p.v))
+  // Gerçek yorum yoksa mock göster (görsel-önce).
+  const displayReviews = reviews && reviews.count > 0 ? reviews : MOCK_REVIEWS
 
   return (
     <div>
@@ -133,6 +183,41 @@ export default function BookDetail() {
                       Bu üründen <span className="font-semibold text-slate-700">{book.purchaseCount.toLocaleString('tr-TR')}</span> adet satın alındı.
                     </p>
                   )}
+
+                  {/* Kitabı beğen (mock) */}
+                  <button
+                    onClick={() => setLiked((v) => !v)}
+                    className={`mt-4 inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                      liked ? 'border-rose-200 bg-rose-50 text-rose-600' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Heart size={15} className={liked ? 'fill-rose-500 text-rose-500' : ''} />
+                    {liked ? 'Beğendin' : 'Beğen'}
+                    <span className="text-slate-400">· {(MOCK_LIKES + (liked ? 1 : 0)).toLocaleString('tr-TR')}</span>
+                  </button>
+
+                  {/* Okuma durumu (mock) — tek seçili; tekrar tıkla kaldır */}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {([
+                      { key: 'will', label: 'Okuyacağım', icon: BookMarked },
+                      { key: 'reading', label: 'Okuyorum', icon: BookOpen },
+                      { key: 'abandoned', label: 'Yarım bıraktım', icon: PauseCircle },
+                    ] as const).map((s) => {
+                      const on = readingStatus === s.key
+                      const Icon = s.icon
+                      return (
+                        <button
+                          key={s.key}
+                          onClick={() => setReadingStatus((cur) => (cur === s.key ? null : s.key))}
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
+                            on ? 'border-primary bg-primary text-white' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                          }`}
+                        >
+                          <Icon size={14} /> {s.label}
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -165,6 +250,41 @@ export default function BookDetail() {
                 </section>
               )}
 
+              {/* Okuma durumu (mock) */}
+              <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+                <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Okuma Durumu</h2>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                  <div className="flex items-start gap-2.5">
+                    <BookMarked size={18} className="mt-0.5 shrink-0 text-sky-500" />
+                    <div>
+                      <p className="text-lg font-bold text-slate-900">{reading.toLocaleString('tr-TR')}</p>
+                      <p className="text-xs text-slate-500">Şu an okuyan</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-emerald-500" />
+                    <div>
+                      <p className="text-lg font-bold text-slate-900">{finished.toLocaleString('tr-TR')}</p>
+                      <p className="text-xs text-slate-500">Bitiren</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <PauseCircle size={18} className="mt-0.5 shrink-0 text-amber-500" />
+                    <div>
+                      <p className="text-lg font-bold text-slate-900">{abandoned.toLocaleString('tr-TR')}</p>
+                      <p className="text-xs text-slate-500">Yarım bırakan</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2.5">
+                    <Users size={18} className="mt-0.5 shrink-0 text-indigo-500" />
+                    <div>
+                      <p className="text-lg font-bold text-slate-900">%{completionRate}</p>
+                      <p className="text-xs text-slate-500">Bitirme oranı</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
               {/* Bağlı ekoller & kavramlar (= etiketler) */}
               {book.tags.length > 0 && (
                 <section className="mt-6">
@@ -183,25 +303,82 @@ export default function BookDetail() {
                 </section>
               )}
 
-              {/* Okur yorumları (018 Slice 2) — sade; AI özet/sentiment YOK */}
+              {/* Fiyat geçmişi · son 6 ay (mock) */}
+              <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">Fiyat Geçmişi · son 6 ay</h2>
+                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-600">Son 6 ayın en düşüğü</span>
+                </div>
+                <div className="mt-5 flex items-end justify-between gap-3" style={{ height: 130 }}>
+                  {MOCK_PRICE_HISTORY.map((p, i) => {
+                    const last = i === MOCK_PRICE_HISTORY.length - 1
+                    // Görsel aralık: en düşük sütun bile ~24px görünsün (min-max'i 24–96px'e eşle).
+                    const h = 24 + Math.round(((p.v - priceMin) / Math.max(1, priceMax - priceMin)) * 72)
+                    return (
+                      <div key={p.m} className="flex flex-1 flex-col items-center justify-end gap-1.5">
+                        <span className={`text-[11px] font-medium ${last ? 'text-emerald-600' : 'text-slate-400'}`}>{p.v.toLocaleString('tr-TR')}</span>
+                        <div className={`w-full rounded-t-md ${last ? 'bg-emerald-500' : 'bg-slate-200'}`} style={{ height: `${h}px` }} />
+                        <span className="text-[11px] text-slate-400">{p.m}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+                <p className="mt-3 text-xs text-slate-400">
+                  En düşük <span className="font-medium text-slate-600">{priceMin.toLocaleString('tr-TR')} TL</span> · En yüksek {priceMax.toLocaleString('tr-TR')} TL
+                </p>
+              </section>
+
+              {/* Okurların ortak görüşü (mock — ileride ML duygu analizi) */}
+              <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
+                <div className="flex items-center justify-between">
+                  <h2 className="flex items-center gap-1.5 text-sm font-bold tracking-tight text-slate-900">
+                    <Sparkles size={15} className="text-primary" /> Okurların ortak görüşü
+                  </h2>
+                  <span className="text-xs text-slate-400">{MOCK_SENTIMENT.reviewCount.toLocaleString('tr-TR')} yorumdan özet</span>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">{MOCK_SENTIMENT.summary}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {MOCK_SENTIMENT.pills.map((p) => <Pill key={p} tone="blue">{p}</Pill>)}
+                </div>
+                <div className="mt-4 space-y-2.5">
+                  {MOCK_SENTIMENT.dimensions.map((d) => (
+                    <div key={d.label}>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-600">{d.label}</span>
+                        <span className="font-medium text-slate-500">%{d.pct} olumlu</span>
+                      </div>
+                      <div className="mt-1 h-1.5 w-full rounded-full bg-slate-100">
+                        <div className={`h-1.5 rounded-full ${d.pct >= 85 ? 'bg-primary' : 'bg-amber-400'}`} style={{ width: `${d.pct}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-xs text-slate-400">Yalnızca gerçek okur yorumlarından damıtılır; Kâşif kitabı kendi başına yorumlamaz.</p>
+              </section>
+
+              {/* Okur yorumları — puan + bir kısmı/tümü + yorum yaz + nested reply */}
               <section className="mt-8 border-t border-slate-200 pt-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold tracking-tight text-slate-900">Okur Yorumları</h2>
-                  {reviews && reviews.count > 0 && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Stars value={reviews.average} />
-                      <span className="font-semibold text-slate-800">{reviews.average.toFixed(1)}</span>
-                      <span className="text-slate-400">({reviews.count.toLocaleString('tr-TR')} yorum)</span>
+                  <div className="flex items-center gap-3">
+                    <div className="hidden items-center gap-2 text-sm sm:flex">
+                      <Stars value={displayReviews.average} />
+                      <span className="font-semibold text-slate-800">{displayReviews.average.toFixed(1)}</span>
+                      <span className="text-slate-400">({displayReviews.count.toLocaleString('tr-TR')} yorum)</span>
                     </div>
-                  )}
+                    {/* Yorum yaz (mock) */}
+                    <button className="rounded-xl border border-slate-200 px-3 py-1.5 text-sm font-semibold text-primary hover:bg-blue-50">
+                      Yorum yaz
+                    </button>
+                  </div>
                 </div>
 
-                {!reviews || reviews.count === 0 ? (
+                {displayReviews.count === 0 ? (
                   <p className="mt-4 text-sm text-slate-400">Henüz yorum yok. İlk yorumu satın alanlar yazabilir.</p>
                 ) : (
                   <>
                     <div className="mt-4 space-y-4">
-                      {reviews.items.map((r, i) => (
+                      {(showAllReviews ? displayReviews.items : displayReviews.items.slice(0, REVIEWS_PREVIEW)).map((r, i) => (
                         <div key={i} className="rounded-2xl border border-slate-200 bg-white p-4">
                           <div className="flex items-center justify-between">
                             <span className="font-medium text-slate-800">{r.author}</span>
@@ -209,11 +386,30 @@ export default function BookDetail() {
                           </div>
                           <div className="mt-1"><Stars value={r.rating} size={13} /></div>
                           {r.text && <p className="mt-2 text-sm leading-relaxed text-slate-600">{r.text}</p>}
+
+                          {/* Yoruma yorum (nested, mock) — ilk yorumda örnek bir yanıt */}
+                          {i === 0 && (
+                            <div className="mt-3 border-l-2 border-slate-100 pl-3">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-slate-700">Ahmet T.</span>
+                                <span className="text-xs text-slate-400">15.09.2026</span>
+                              </div>
+                              <p className="mt-1 text-sm leading-relaxed text-slate-500">Katılıyorum, finali uzun süre aklımdan çıkmadı.</p>
+                            </div>
+                          )}
+                          <button className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-primary">
+                            <MessageCircle size={13} /> Yanıtla
+                          </button>
                         </div>
                       ))}
                     </div>
-                    {reviews.count > reviews.items.length && (
-                      <p className="mt-3 text-xs text-slate-400">İlk {reviews.items.length} yorum gösteriliyor · toplam {reviews.count}.</p>
+                    {!showAllReviews && displayReviews.items.length > REVIEWS_PREVIEW && (
+                      <button
+                        onClick={() => setShowAllReviews(true)}
+                        className="mt-4 w-full rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                      >
+                        Tüm yorumları göster ({displayReviews.count.toLocaleString('tr-TR')})
+                      </button>
                     )}
                   </>
                 )}
@@ -260,6 +456,16 @@ export default function BookDetail() {
                       <Lock size={15} /> Sepete eklemek için giriş yap
                     </Link>
                   )}
+                </div>
+
+                {/* Fiyat alarmı + stok bildirimi — ayrı butonlar (mock) */}
+                <div className="mt-3 space-y-2">
+                  <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                    <Bell size={15} /> {isAuthenticated ? 'Fiyat alarmı kur' : 'Fiyat alarmı için giriş yap'}
+                  </button>
+                  <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50">
+                    <Package size={15} /> {isAuthenticated ? 'Stok bildirimi al' : 'Stok bildirimi için giriş yap'}
+                  </button>
                 </div>
               </div>
             </aside>
