@@ -118,6 +118,13 @@ export function searchTyped(
   )
 }
 
+// 029: "Sana Özel" ana sayfa feed'i — sorgu YOK, kişisel (deterministik). Bearer ŞART (anonim → 401).
+// Cevap sendMessage ile aynı şekil (ChatResponse); yalnız reply'ı ({text, items}) döneriz.
+export function getFeed(token: string): Promise<ChatReply> {
+  return request<SendMessageResult>('/api/chat/v1/feed', { method: 'GET' }, token)
+    .then((r) => r.reply)
+}
+
 export function listConversations(token: string): Promise<{ conversations: ConversationSummary[] }> {
   return request<{ conversations: ConversationSummary[] }>(
     '/api/chat/v1/conversations',

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
-import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle, BookOpen } from 'lucide-react'
+import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle } from 'lucide-react'
 import { getConversation, ChatApiError, extractIntent, searchTyped, type ReplyItem, type LastSearch, type BookSearchFilters } from '../api/chat'
-import { slugify } from '../api/catalog'
+import { BookCard, normalizeBook, pick, type ToolBook } from '../components/BookCard'
 import { exampleChips } from '../config/discoverCards'
 import { useAuthSession } from '../auth/useAuthSession'
 import { getAnon, saveAnon } from '../lib/anonChats'
@@ -67,23 +67,6 @@ function summarizeFilters(f?: BookSearchFilters): string[] {
   return out
 }
 
-// search_books/get_book tool dönüşündeki kitap — casing defansif (MCP/STJ serileştirmesi camel|Pascal).
-interface ToolBook {
-  id?: string
-  title?: string
-  authors?: string
-  publisher?: string
-  isbn?: string
-  price?: number | null
-  isSalable?: boolean
-  coverUrl?: string | null
-}
-
-function pick<T>(o: Record<string, unknown>, ...keys: string[]): T | undefined {
-  for (const k of keys) if (o[k] != null) return o[k] as T
-  return undefined
-}
-
 // Cevaptaki son search_books item'ından sayfalama durumu ("devamını getir" için). filters backend'in
 // echo'ladığı kullanılan args; page sonucun o anki sayfası. Yoksa undefined (arama yapılmadı).
 function lastSearchFromItems(items?: ReplyItem[]): LastSearch | undefined {
@@ -93,33 +76,12 @@ function lastSearchFromItems(items?: ReplyItem[]): LastSearch | undefined {
   return { filters: item.filters, page: pick<number>(r, 'page', 'Page') ?? 1 }
 }
 
-function normalizeBook(raw: unknown): ToolBook {
-  const o = (raw ?? {}) as Record<string, unknown>
-  return {
-    id: pick<string>(o, 'id', 'Id'),
-    title: pick<string>(o, 'title', 'Title'),
-    authors: pick<string>(o, 'authors', 'Authors'),
-    publisher: pick<string>(o, 'publisher', 'Publisher'),
-    isbn: pick<string>(o, 'isbn', 'Isbn'),
-    price: pick<number>(o, 'price', 'Price') ?? null,
-    isSalable: pick<boolean>(o, 'isSalable', 'IsSalable'),
-    coverUrl: pick<string>(o, 'coverUrl', 'CoverUrl') ?? null,
-  }
-}
-
 function booksFromItem(item: ReplyItem): ToolBook[] {
   const r = (item.result ?? {}) as Record<string, unknown>
   if (item.tool === 'get_book') return [normalizeBook(r)]
   // search_books: { items|Items: [...] }
   const arr = pick<unknown[]>(r, 'items', 'Items') ?? []
   return Array.isArray(arr) ? arr.map(normalizeBook) : []
-}
-
-// ISBN'i kapak URL'inin son segmentinden çöz (.../r2.dev/<isbn>) — search_books Id(GUID) döner, isbn yok.
-function isbnFromCover(coverUrl?: string | null): string | undefined {
-  if (!coverUrl) return undefined
-  const seg = coverUrl.split('?')[0].split('/').pop()
-  return seg && /^\d{10,13}$/.test(seg) ? seg : undefined
 }
 
 // Agent cevabı markdown render edilir — ama kapak `![alt](url)` RESİM olarak GÖMÜLMEZ; tıklanabilir
@@ -142,32 +104,6 @@ function AgentText({ text }: { text: string }) {
       >
         {text}
       </ReactMarkdown>
-    </div>
-  )
-}
-
-function BookCard({ book }: { book: ToolBook }) {
-  const isbn = book.isbn ?? isbnFromCover(book.coverUrl)
-  const title = book.title ?? 'Kitap'
-  const href = isbn ? `/kitap/${slugify(title)}-${isbn}` : undefined
-  return (
-    <div className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-3">
-      {book.coverUrl
-        ? <img src={book.coverUrl} alt="" loading="lazy" className="h-20 w-14 shrink-0 rounded object-cover" />
-        : <span className="flex h-20 w-14 shrink-0 items-center justify-center rounded bg-blue-50 text-primary"><BookOpen size={18} /></span>}
-      <div className="min-w-0">
-        {href
-          ? <Link to={href} className="font-semibold text-slate-800 hover:text-primary hover:underline">{title}</Link>
-          : <span className="font-semibold text-slate-800">{title}</span>}
-        {book.authors && <p className="text-xs text-slate-500">{book.authors}</p>}
-        {book.publisher && <p className="text-xs text-slate-400">{book.publisher}</p>}
-        <p className="mt-1 text-sm">
-          {typeof book.price === 'number' && book.price > 0
-            ? <span className="font-medium text-slate-700">{book.price.toLocaleString('tr-TR')} ₺</span>
-            : <span className="text-slate-400">Fiyat yok</span>}
-          {book.isSalable === false && <span className="ml-2 text-xs text-amber-600">satışa uygun değil</span>}
-        </p>
-      </div>
     </div>
   )
 }
