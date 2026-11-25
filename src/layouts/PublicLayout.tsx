@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import {
   MessageSquare, Book, NotebookPen, Layers, Quote, BarChart3,
   Sparkles, Bell, Heart, Truck, MapPin, Settings, ShoppingCart, Lock, LogOut,
-  Menu, X, ChevronDown,
+  Menu, X, ChevronDown, Search,
 } from 'lucide-react'
 import { Logo } from '../components/ui'
 import ConversationSidebar from '../components/ConversationSidebar'
@@ -21,6 +21,7 @@ const personalNav = [
   { to: '/raflarim', label: 'Raflarım', icon: Layers, locked: true },
   { to: '/alintilarim', label: 'Alıntılarım', icon: Quote, locked: true },
   { to: '/okuma-profilim', label: 'Okuma Profilim', icon: BarChart3, locked: true },
+  { to: '/arama-gecmisim', label: 'Arama Geçmişim', icon: Search, locked: true },
 ]
 
 // HESABIM — işlemsel/hesap (kimlik değil). Haftalık Seçki küratörlü keşif, burada.
