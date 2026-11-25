@@ -12,8 +12,7 @@ export interface DiscoverCard {
 }
 
 export const discoverCards: DiscoverCard[] = [
-  // Betimleyici (semantik yolu sergiler — cümle-boyu anlatım)
-  { tag: 'RUH HALİNE GÖRE', icon: 'sparkles', text: 'Yoğun bir haftanın ardından beni başka bir dünyaya götürecek bir roman.', status: 'active' },
+  // Betimleyici (semantik yolu sergiler — cümle-boyu anlatım). 9 kart = temiz 3x3 grid.
   { tag: 'HİSSE GÖRE', icon: 'sparkles', text: 'İçimi ısıtan, sakin ve umutlu bir hikaye.', status: 'active' },
   { tag: 'ATMOSFER', icon: 'sparkles', text: 'Gece bitiremeyeceğim, tedirgin eden karanlık bir gerilim.', status: 'active' },
   { tag: 'BENZER KİTAP', icon: 'copy', text: 'Simyacı’yı sevdim, buna benzer ne okumalıyım?', status: 'active' },
