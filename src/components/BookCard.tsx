@@ -13,6 +13,8 @@ export interface ToolBook {
   price?: number | null
   isSalable?: boolean
   coverUrl?: string | null
+  pageCount?: number | null
+  discountRate?: number | null   // kesir (0–0.90]; indirimli = price*(1-rate). null/0 = indirim yok.
 }
 
 // İlk null-olmayan anahtarı seçer (camel|Pascal toleransı). Kart dışında da (ChatWorkspace rows/sayfalama) kullanılır.
@@ -32,6 +34,8 @@ export function normalizeBook(raw: unknown): ToolBook {
     price: pick<number>(o, 'price', 'Price') ?? null,
     isSalable: pick<boolean>(o, 'isSalable', 'IsSalable'),
     coverUrl: pick<string>(o, 'coverUrl', 'CoverUrl') ?? null,
+    pageCount: pick<number>(o, 'pageCount', 'PageCount') ?? null,
+    discountRate: pick<number>(o, 'discountRate', 'DiscountRate') ?? null,
   }
 }
 
@@ -64,9 +68,19 @@ export function BookCard({ book }: { book: ToolBook }) {
           : <span className="font-semibold text-slate-800">{title}</span>}
         {book.authors && <p className="text-xs text-slate-500">{book.authors}</p>}
         {book.publisher && <p className="text-xs text-slate-400">{book.publisher}</p>}
+        {typeof book.pageCount === 'number' && book.pageCount > 0 &&
+          <p className="text-xs text-slate-400">{book.pageCount} sayfa</p>}
         <p className="mt-1 text-sm">
           {typeof book.price === 'number' && book.price > 0
-            ? <span className="font-medium text-slate-700">{book.price.toLocaleString('tr-TR')} ₺</span>
+            ? (book.discountRate && book.discountRate > 0
+                ? <>
+                    <span className="font-semibold text-slate-800">
+                      {(book.price * (1 - book.discountRate)).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺
+                    </span>
+                    <span className="ml-2 text-xs text-slate-400 line-through">{book.price.toLocaleString('tr-TR')} ₺</span>
+                    <span className="ml-2 rounded bg-rose-50 px-1.5 py-0.5 text-xs font-medium text-rose-600">%{Math.round(book.discountRate * 100)}</span>
+                  </>
+                : <span className="font-medium text-slate-700">{book.price.toLocaleString('tr-TR')} ₺</span>)
             : <span className="text-slate-400">Fiyat yok</span>}
           {book.isSalable === false && <span className="ml-2 text-xs text-amber-600">satışa uygun değil</span>}
         </p>

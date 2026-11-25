@@ -18,6 +18,7 @@ import Shelves from './pages/Shelves'
 import WeeklyPicks from './pages/WeeklyPicks'
 import Addresses from './pages/Addresses'
 import AccountSettings from './pages/AccountSettings'
+import SearchHistory from './pages/SearchHistory'
 import LoginRedirect from './pages/LoginRedirect'
 import AuthCallback from './pages/AuthCallback'
 import RequireAuth from './auth/RequireAuth'
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/siparislerim" element={<OrderConfirmation />} />
           <Route path="/kitapligim" element={<Library />} />
           <Route path="/okuma-profilim" element={<ReadingProfile />} />
+          <Route path="/arama-gecmisim" element={<SearchHistory />} />
           <Route path="/alintilarim" element={<Quotes />} />
           <Route path="/okuma-gunlugum" element={<Journal />} />
           <Route path="/raflarim" element={<Shelves />} />
