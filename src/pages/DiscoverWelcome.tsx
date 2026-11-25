@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { Box, Sparkles, Copy, Book, Tag, Clock, TrendingUp, ArrowRight, Paperclip, ArrowUp } from 'lucide-react'
 import { Crumb } from '../components/ui'
+import { PersonalShelf } from '../components/PersonalShelf'
 import data from '../mocks/discover.json'
 import { discoverCards } from '../config/discoverCards'
 
@@ -35,6 +36,8 @@ export default function DiscoverWelcome() {
         </span>
         <h1 className="mt-5 text-center text-4xl font-bold leading-tight tracking-tight">{data.title}</h1>
         <p className="mt-4 max-w-xl text-center text-slate-500">{data.subtitle}</p>
+
+        <PersonalShelf />
 
         <p className="mt-10 text-sm font-medium text-slate-600">Bir örnekle başla</p>
         <div className="mt-4 grid w-full grid-cols-1 gap-4 md:grid-cols-3">
