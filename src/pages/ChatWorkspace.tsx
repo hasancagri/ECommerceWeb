@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link, useLocation, useSearchParams } from 'react-router'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router'
 import ReactMarkdown from 'react-markdown'
 import { Sparkles, Check, Paperclip, ArrowUp, MessageSquare, Loader2, AlertCircle } from 'lucide-react'
 import { getConversation, ChatApiError, extractIntent, searchTyped, type ReplyItem, type LastSearch, type BookSearchFilters } from '../api/chat'
@@ -257,6 +257,7 @@ function ToolItem({ item }: { item: ReplyItem }) {
 
 export default function ChatWorkspace() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [params] = useSearchParams()
   const { accessToken, isAuthenticated } = useAuthSession()
   const [messages, setMessages] = useState<Msg[]>([])
@@ -366,6 +367,10 @@ export default function ChatWorkspace() {
     }
     // 020-voice: sesle gelen metin composer'a düşer — OTOMATİK GÖNDERME YOK (FR-004).
     else if (st?.draft) setInput(st.draft)
+    // router-state'i TÜKET: history entry'den temizle (replace) → kitap detayından geri dönünce
+    // remount olup aynı message'ı TEKRAR göndermesin (initialSentRef unmount'ta sıfırlanıyor; guard
+    // yetmiyor çünkü state history'de yaşıyor). State yoksa dokunma (gereksiz replace döngüsü yok).
+    if (st?.message || st?.draft) navigate(`${location.pathname}${location.search}`, { replace: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId, openConvo])
 
