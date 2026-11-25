@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router'
 import {
   MessageSquare, Book, NotebookPen, Layers, Quote, BarChart3,
   Sparkles, Bell, Heart, Truck, MapPin, Settings, ShoppingCart, Lock, LogOut,
-  Menu, X,
+  Menu, X, ChevronDown,
 } from 'lucide-react'
 import { Logo } from '../components/ui'
 import ConversationSidebar from '../components/ConversationSidebar'
@@ -14,12 +14,17 @@ const assistantNav = [
   { to: '/sohbet', label: 'Aktif Sohbet & Tavsiyeler', icon: MessageSquare },
 ]
 
+// KİŞİSEL ALAN klasörü — okur kimliği (kullanıcının ürettiği/biriktirdiği). Collapse edilebilir grup.
 const personalNav = [
   { to: '/kitapligim', label: 'Kişisel Kitaplığım', icon: Book, locked: true },
   { to: '/okuma-gunlugum', label: 'Okuma Günlüğüm', icon: NotebookPen, locked: true },
   { to: '/raflarim', label: 'Raflarım', icon: Layers, locked: true },
   { to: '/alintilarim', label: 'Alıntılarım', icon: Quote, locked: true },
   { to: '/okuma-profilim', label: 'Okuma Profilim', icon: BarChart3, locked: true },
+]
+
+// HESABIM — işlemsel/hesap (kimlik değil). Haftalık Seçki küratörlü keşif, burada.
+const accountNav = [
   { to: '/haftalik-secki', label: 'Haftalık Seçki', icon: Sparkles, locked: true },
   { to: '/fiyat-alarmlari', label: 'Fiyat Alarmları', icon: Bell, locked: true },
   { to: '/takiplerim', label: 'Takiplerim', icon: Heart, locked: true },
@@ -61,6 +66,7 @@ export default function PublicLayout() {
   const { isAuthenticated, displayName, logout } = useAuthSession()
   const guest = !isAuthenticated
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [personalOpen, setPersonalOpen] = useState(true)   // KİŞİSEL ALAN klasörü — varsayılan açık
   const location = useLocation()
 
   // Rota değişince mobil drawer'ı kapat (nav tıklaması sayfayı değiştirince içerik görünsün).
@@ -88,10 +94,19 @@ export default function PublicLayout() {
           <ConversationSidebar />
         </div>
 
-        <p className="px-3 pb-2 pt-6 text-[11px] font-semibold tracking-wider text-slate-400">
-          {guest ? 'KİŞİSEL ALAN · ÜYELERE ÖZEL' : 'KİŞİSEL ALAN'}
-        </p>
-        {personalNav.map((it) => <NavItem key={it.to} {...it} guest={guest} onNavigate={closeDrawer} />)}
+        <button
+          type="button"
+          onClick={() => setPersonalOpen((o) => !o)}
+          className="mt-6 flex w-full items-center justify-between px-3 pb-2 text-[11px] font-semibold tracking-wider text-slate-400 hover:text-slate-600"
+          aria-expanded={personalOpen}
+        >
+          <span>{guest ? 'KİŞİSEL ALAN · ÜYELERE ÖZEL' : 'KİŞİSEL ALAN'}</span>
+          <ChevronDown size={14} className={`transition-transform ${personalOpen ? '' : '-rotate-90'}`} />
+        </button>
+        {personalOpen && personalNav.map((it) => <NavItem key={it.to} {...it} guest={guest} onNavigate={closeDrawer} />)}
+
+        <p className="px-3 pb-2 pt-6 text-[11px] font-semibold tracking-wider text-slate-400">HESABIM</p>
+        {accountNav.map((it) => <NavItem key={it.to} {...it} guest={guest} onNavigate={closeDrawer} />)}
       </nav>
 
       {guest ? (
