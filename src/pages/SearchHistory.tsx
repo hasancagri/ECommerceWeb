@@ -13,19 +13,28 @@ const MODE_LABEL: Record<string, string> = { keyword: 'Kelime', semantic: 'Anlam
 // 013: Arama geçmişi yönetim sayfası — AccountSettings'ten ayrı sayfaya taşındı (KİŞİSEL ALAN maddesi).
 // Tümü auth-zorunlu (Personalization API bearer ile); geçmişi silmek taste'i on-demand sıfırlar.
 export default function SearchHistory() {
-  const { accessToken } = useAuthSession()
+  const { accessToken, isAuthenticated, isLoading, login } = useAuthSession()
   const navigate = useNavigate()
 
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState<SearchHistoryPage | null>(null)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [busy, setBusy] = useState(false)
 
   const loadSearch = useCallback(() => {
     if (!accessToken) return
-    getSearchHistory(accessToken, page, 20).then(setSearch).catch(() => setSearch(null))
+    setStatus('loading')
+    getSearchHistory(accessToken, page, 20)
+      .then((p) => { setSearch(p); setStatus('ready') })
+      .catch(() => setStatus('error'))
   }, [accessToken, page])
 
-  useEffect(() => { loadSearch() }, [loadSearch])
+  // Auth çözülene kadar bekle; login değilse istek atma. (Eski kod burada erken dönüp state
+  // değiştirmiyordu → search null kalıyor → sonsuz "Yükleniyor…". Sonsuz-spinner'ın kök nedeni.)
+  useEffect(() => {
+    if (isLoading || !isAuthenticated) return
+    loadSearch()
+  }, [isLoading, isAuthenticated, loadSearch])
 
   // Öğeye tıkla → sohbete git, o sorgu ile çalıştır (router state → ChatWorkspace otomatik gönderir).
   function reSearch(item: SearchHistoryItem) {
@@ -69,7 +78,21 @@ export default function SearchHistory() {
           )}
         </div>
 
-        {search === null ? (
+        {isLoading ? (
+          <div className="mt-8 flex items-center gap-2 text-slate-400"><Loader2 size={16} className="animate-spin" /> Yükleniyor…</div>
+        ) : !isAuthenticated ? (
+          <div className="mt-8">
+            <p className="text-slate-500">Arama geçmişini görmek için giriş yapmalısın.</p>
+            <button onClick={() => login('/arama-gecmisim')}
+              className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white hover:opacity-90">Giriş yap</button>
+          </div>
+        ) : status === 'error' ? (
+          <div className="mt-8">
+            <p className="text-slate-500">Arama geçmişin yüklenemedi. Bağlantını kontrol edip tekrar dene.</p>
+            <button onClick={loadSearch}
+              className="mt-4 rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold hover:bg-slate-50">Tekrar dene</button>
+          </div>
+        ) : status === 'loading' ? (
           <div className="mt-8 flex items-center gap-2 text-slate-400"><Loader2 size={16} className="animate-spin" /> Yükleniyor…</div>
         ) : searchItems.length === 0 ? (
           <p className="mt-8 text-slate-400">Henüz arama geçmişin yok. Keşfe başla, aramaların burada birikir.</p>
