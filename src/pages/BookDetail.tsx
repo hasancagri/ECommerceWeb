@@ -7,6 +7,7 @@ import {
 import { Crumb, Stars, Pill } from '../components/ui'
 import { useAuthSession } from '../auth/useAuthSession'
 import { getProductByIsbn, type BookDetailDto } from '../api/catalog'
+import { recordView } from '../api/library'
 import { getBookReviews, type BookReviews } from '../api/reviews'
 
 // ── MOCK veri (görsel-önce; blok blok gerçek backend'e bağlanacak) ──────────────
@@ -72,7 +73,7 @@ function SpecRow({ label, value }: { label: string; value: string | number | nul
 export default function BookDetail() {
   const { slug } = useParams()
   const isbn = isbnFromSlug(slug)
-  const { isAuthenticated } = useAuthSession()
+  const { isAuthenticated, accessToken } = useAuthSession()
   const [book, setBook] = useState<BookDetailDto | null>(null)
   const [state, setState] = useState<'loading' | 'ok' | 'notfound' | 'error'>('loading')
   const [reviews, setReviews] = useState<BookReviews | null>(null)
@@ -105,6 +106,19 @@ export default function BookDetail() {
     if (!book) return
     getBookReviews(book.id, 1).then(setReviews).catch(() => setReviews(null))
   }, [book])
+
+  // Son Gezdiğim Kitaplar: login kullanıcı kitabı gezince kaydı düşer (ateşle-unut; anonimse HİÇ çağırma;
+  // hata sayfayı bozmaz). Künye-snapshot taşınır (yaklaşım A — Library BC-arası çağrı yapmaz).
+  useEffect(() => {
+    if (!book || !isAuthenticated || !accessToken) return
+    recordView(accessToken, {
+      productId: book.id,
+      title: book.title,
+      author: book.authors,
+      coverUrl: book.coverUrl,
+      isbn: book.isbn,
+    }).catch(() => {})
+  }, [book, isAuthenticated, accessToken])
 
   const discounted = book && book.price != null && book.discountRate
     ? Math.round(book.price * (1 - book.discountRate) * 100) / 100
