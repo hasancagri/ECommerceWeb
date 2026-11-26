@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { Box, Sparkles, Copy, Book, Tag, Clock, TrendingUp, ArrowRight, Paperclip, ArrowUp } from 'lucide-react'
 import { Crumb } from '../components/ui'
 import { PersonalShelf } from '../components/PersonalShelf'
+import { RecentlyViewedStrip } from '../components/RecentlyViewedStrip'
 import data from '../mocks/discover.json'
 import { discoverCards } from '../config/discoverCards'
 
@@ -71,6 +72,8 @@ export default function DiscoverWelcome() {
             )
           })}
         </div>
+
+        <RecentlyViewedStrip />
 
         <form
           onSubmit={(e) => { e.preventDefault(); if (input.trim()) toChat(navigate, input.trim()) }}
